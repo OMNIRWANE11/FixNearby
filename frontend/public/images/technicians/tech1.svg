@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="48" fill="#1A1A1A" stroke="#00F0FF" stroke-width="2"/>
+  <circle cx="50" cy="40" r="22" fill="#2B2B2B"/>
+  <text x="50" y="47" font-family="Inter, sans-serif" font-weight="800" font-size="16" fill="#FAEBD7" text-anchor="middle">RP</text>
+  <path d="M22 84 C22 68 34 62 50 62 C66 62 78 68 78 84 Z" fill="#2B2B2B"/>
+  <circle cx="75" cy="75" r="14" fill="#121212" stroke="#00F0FF" stroke-width="1.5"/>
+  <text x="75" y="80" font-size="12" text-anchor="middle">⚡</text>
+</svg>

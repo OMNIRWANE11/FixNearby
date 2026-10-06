@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline Mode — FixNearby Emergency Resilience</title>
+  <style>
+    :root {
+      --bg: #121212;
+      --surface: #1A1A1A;
+      --border: #2E2E2E;
+      --aqua: #00F0FF;
+      --red: #FF3333;
+      --text: #FAEBD7;
+      --muted: #858585;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 1.5rem;
+      line-height: 1.6;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(255, 51, 51, 0.15);
+      border: 1px solid var(--red);
+      color: var(--red);
+      font-weight: bold;
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+    }
+    h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .call-btn {
+      display: inline-block;
+      background: var(--red);
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+      margin-top: 0.5rem;
+    }
+    ul { padding-left: 1.25rem; margin-top: 0.5rem; }
+    li { margin-bottom: 0.35rem; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="badge">📶 OFFLINE EMERGENCY MODE</div>
+    <h1>FixNearby Emergency Protocols</h1>
+    <p style="color: var(--muted); font-size: 0.95rem;">
+      You are currently without internet connectivity. Use these cached emergency instructions and direct phone dialers.
+    </p>
+  </div>
+
+  <div class="card" style="border-left: 4px solid var(--red);">
+    <h2 style="font-size: 1.2rem; color: var(--red);">🚨 National Emergency Helplines (Direct Call)</h2>
+    <p style="font-size: 0.9rem; margin-top: 0.25rem;">Direct phone dialing does not require active internet data.</p>
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem;">
+      <a href="tel:112" class="call-btn">📞 Dial 112 (All Emergencies)</a>
+      <a href="tel:101" class="call-btn" style="background: #FFB020; color: #000;">📞 Dial 101 (Fire Brigade)</a>
+      <a href="tel:108" class="call-btn" style="background: var(--aqua); color: #000;">📞 Dial 108 (Ambulance)</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size: 1.2rem; color: var(--aqua); margin-bottom: 0.5rem;">⚡ Electrical Hazard Emergency Protocol</h2>
+    <ul>
+      <li><strong>Switch OFF</strong> the main distribution board or meter switch immediately.</li>
+      <li><strong>DO NOT</strong> touch any person in contact with live wire with bare hands. Use dry wood.</li>
+      <li><strong>NEVER</strong> spray water on an electrical flame or smoking outlet.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size: 1.2rem; color: var(--aqua); margin-bottom: 0.5rem;">💧 Major Water Rupture / Flooding Protocol</h2>
+    <ul>
+      <li><strong>Shut the main gate valve</strong> below the overhead tank or municipal inlet.</li>
+      <li><strong>Turn off electric circuit breakers</strong> in the wet room to avoid lethal conduction.</li>
+      <li>Elevate appliances and power strips above floor level.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size: 1.2rem; color: var(--aqua); margin-bottom: 0.5rem;">🚗 Roadside Vehicle Breakdown Protocol</h2>
+    <ul>
+      <li>Move the vehicle fully onto the outer road shoulder away from active traffic.</li>
+      <li>Turn on hazard flashers immediately.</li>
+      <li>Stand behind the highway crash barrier while waiting for assistance.</li>
+    </ul>
+  </div>
+
+  <p style="text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 2rem;">
+    Once internet connection is restored, refresh to access live GPS technician tracking.
+  </p>
+</body>
+</html>
+

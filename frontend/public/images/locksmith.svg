@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250">
+  <rect width="400" height="250" rx="12" fill="#1A1A1A"/>
+  <rect x="10" y="10" width="380" height="230" rx="8" fill="#232323" stroke="#2E2E2E"/>
+  <circle cx="200" cy="110" r="55" fill="rgba(0, 240, 255, 0.1)" stroke="#00F0FF" stroke-width="2"/>
+  <rect x="175" y="100" width="50" height="40" rx="6" fill="#00F0FF"/>
+  <path d="M185 100 L185 85 C185 76 191 70 200 70 C209 70 215 76 215 85 L215 100" fill="none" stroke="#00F0FF" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="200" cy="118" r="4" fill="#1A1A1A"/>
+  <line x1="200" y1="120" x2="200" y2="128" stroke="#1A1A1A" stroke-width="3"/>
+  <text x="200" y="200" fill="#FAEBD7" font-family="sans-serif" font-weight="700" font-size="18" text-anchor="middle">LOCKSMITH EMERGENCY</text>
+  <text x="200" y="222" fill="#858585" font-family="sans-serif" font-size="12" text-anchor="middle">Door Lockout • Lost Keys • Broken Lock</text>
+</svg>
+

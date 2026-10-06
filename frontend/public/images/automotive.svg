@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250">
+  <rect width="400" height="250" rx="12" fill="#1A1A1A"/>
+  <rect x="10" y="10" width="380" height="230" rx="8" fill="#232323" stroke="#2E2E2E"/>
+  <circle cx="200" cy="110" r="55" fill="rgba(0, 240, 255, 0.1)" stroke="#00F0FF" stroke-width="2"/>
+  <path d="M165 115 L175 90 L225 90 L235 115 L245 115 C248 115 250 117 250 120 L250 135 L150 135 L150 120 C150 117 152 115 155 115 Z" fill="#00F0FF"/>
+  <circle cx="170" cy="135" r="10" fill="#1A1A1A" stroke="#00F0FF" stroke-width="3"/>
+  <circle cx="230" cy="135" r="10" fill="#1A1A1A" stroke="#00F0FF" stroke-width="3"/>
+  <text x="200" y="200" fill="#FAEBD7" font-family="sans-serif" font-weight="700" font-size="18" text-anchor="middle">AUTOMOTIVE BREAKDOWN</text>
+  <text x="200" y="222" fill="#858585" font-family="sans-serif" font-size="12" text-anchor="middle">Dead Battery • Flat Tyre • Towing</text>
+</svg>
+

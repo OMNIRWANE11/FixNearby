@@ -1,0 +1,301 @@
+{
+  "info": {
+    "name": "FixNearby API Collection",
+    "description": "Production REST API Collection for FixNearby Emergency Discovery & Service Marketplace.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "badgeCode",
+      "value": "FN-88492",
+      "type": "string"
+    },
+    {
+      "key": "requestId",
+      "value": "req-live-kolhapur-001",
+      "type": "string"
+    },
+    {
+      "key": "technicianId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register Customer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newcitizen@fixnearby.local\",\n  \"password\": \"CitizenPass@123\",\n  \"fullName\": \"Rahul Shinde\",\n  \"phone\": \"+919822998877\",\n  \"role\": \"customer\",\n  \"savedAddress\": \"Tarabai Park, Kolhapur\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Login Citizen / Technician",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"citizen@fixnearby.local\",\n  \"password\": \"CitizenPass@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Get Current User Profile (Me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Services & Categories",
+      "item": [
+        {
+          "name": "List Service Categories",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] }
+          }
+        },
+        {
+          "name": "Get Category Problem Types",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/categories/1/problems", "host": ["{{baseUrl}}"], "path": ["categories", "1", "problems"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Technicians",
+      "item": [
+        {
+          "name": "List Technicians (with Geospatial Radius)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/technicians?lat=16.7050&lng=74.2433&radiusKm=25&category=electrical&onDutyOnly=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["technicians"],
+              "query": [
+                { "key": "lat", "value": "16.7050" },
+                { "key": "lng", "value": "74.2433" },
+                { "key": "radiusKm", "value": "25" },
+                { "key": "category", "value": "electrical" },
+                { "key": "onDutyOnly", "value": "true" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Technician Profile & Audit Checks",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/technicians/{{technicianId}}", "host": ["{{baseUrl}}"], "path": ["technicians", "{{technicianId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Verification (4-Point Audit)",
+      "item": [
+        {
+          "name": "Verify Badge Code (FN-88492)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/verify/FN-88492", "host": ["{{baseUrl}}"], "path": ["verify", "FN-88492"] }
+          }
+        },
+        {
+          "name": "Verify Failing Audit Badge (FN-33211)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/verify/FN-33211", "host": ["{{baseUrl}}"], "path": ["verify", "FN-33211"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Emergency Requests",
+      "item": [
+        {
+          "name": "Create Emergency SOS Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data.request) {",
+                  "    pm.collectionVariables.set('requestId', jsonData.data.request.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": 1,\n  \"problemTypeId\": 1,\n  \"severity\": \"CRITICAL\",\n  \"customerName\": \"Ananya Sharma\",\n  \"customerPhone\": \"+919822000002\",\n  \"customerAddress\": \"Shahupuri 2nd Lane, Kolhapur\",\n  \"customerLatitude\": 16.7032,\n  \"customerLongitude\": 74.2389\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/requests", "host": ["{{baseUrl}}"], "path": ["requests"] }
+          }
+        },
+        {
+          "name": "Assign Technician to Request",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"technicianId\": \"{{technicianId}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/requests/{{requestId}}/assign", "host": ["{{baseUrl}}"], "path": ["requests", "{{requestId}}", "assign"] }
+          }
+        },
+        {
+          "name": "Update Request Status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ON_THE_WAY\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/requests/{{requestId}}/status", "host": ["{{baseUrl}}"], "path": ["requests", "{{requestId}}", "status"] }
+          }
+        },
+        {
+          "name": "Submit Request Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Quick arrival and verified his FixNearby badge at the entrance. Excellent service!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/requests/{{requestId}}/review", "host": ["{{baseUrl}}"], "path": ["requests", "{{requestId}}", "review"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Live Tracking",
+      "item": [
+        {
+          "name": "Get Live Request Tracking State",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/tracking/{{requestId}}", "host": ["{{baseUrl}}"], "path": ["tracking", "{{requestId}}"] }
+          }
+        },
+        {
+          "name": "Trigger Telemetry Simulation",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/tracking/{{requestId}}/simulate", "host": ["{{baseUrl}}"], "path": ["tracking", "{{requestId}}", "simulate"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Provider Console",
+      "item": [
+        {
+          "name": "Toggle Duty Status (ONLINE / OFFLINE)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"isOnDuty\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/provider/duty", "host": ["{{baseUrl}}"], "path": ["provider", "duty"] }
+          }
+        },
+        {
+          "name": "Transmit Provider GPS Telemetry",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitude\": 16.7045,\n  \"longitude\": 74.2410,\n  \"speedKmh\": 32.5\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/provider/location", "host": ["{{baseUrl}}"], "path": ["provider", "location"] }
+          }
+        },
+        {
+          "name": "List Provider Incoming Requests",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/provider/requests", "host": ["{{baseUrl}}"], "path": ["provider", "requests"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Admin Console",
+      "item": [
+        {
+          "name": "Admin Metrics Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/dashboard", "host": ["{{baseUrl}}"], "path": ["admin", "dashboard"] }
+          }
+        }
+      ]
+    }
+  ]
+}
+
