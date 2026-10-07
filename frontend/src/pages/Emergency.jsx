@@ -12,12 +12,12 @@ import { useToast } from '../components/Toast';
 import { formatDistance, formatEta } from '../utils/formatters';
 import api from '../services/api';
 
-const CATEGORIES = [
-  { id: 1, code: 'electrical', name: 'Electrical', icon: '⚡', desc: 'Short circuit, sparks, MCB trip, wiring fault' },
-  { id: 2, code: 'plumbing', name: 'Plumbing', icon: '💧', desc: 'Burst pipe, water leakage, tap rupture, motor lock' },
-  { id: 3, code: 'automotive', name: 'Automotive', icon: '🚗', desc: 'Dead battery, flat tyre, breakdown, towing' },
-  { id: 4, code: 'locksmith', name: 'Locksmith', icon: '🔐', desc: 'House lockout, lost keys, jammed security lock' },
-];
+const CATEGORIES_META = {
+  electrical: { icon: '⚡', desc: 'Short circuit, sparks, MCB trip, wiring fault' },
+  plumbing: { icon: '💧', desc: 'Burst pipe, water leakage, tap rupture, motor lock' },
+  automotive: { icon: '🚗', desc: 'Dead battery, flat tyre, breakdown, towing' },
+  locksmith: { icon: '🔐', desc: 'House lockout, lost keys, jammed security lock' }
+};
 
 export function Emergency() {
   const navigate = useNavigate();
@@ -26,6 +26,7 @@ export function Emergency() {
   const { user } = useAuth();
   const { showToast } = useToast();
 
+  const [categories, setCategories] = useState([]);
   const [step, setStep] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [problemTypes, setProblemTypes] = useState([]);
@@ -38,16 +39,25 @@ export function Emergency() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dispatchResult, setDispatchResult] = useState(null);
 
+  // Fetch categories on mount
+  useEffect(() => {
+    api.services.getCategories().then((res) => {
+      if (res.success && res.data) {
+        setCategories(res.data);
+      }
+    }).catch(console.error);
+  }, []);
+
   // Preselect category from query param if provided
   useEffect(() => {
     const catCode = searchParams.get('category');
-    if (catCode) {
-      const match = CATEGORIES.find((c) => c.code === catCode.toLowerCase());
+    if (catCode && categories.length > 0) {
+      const match = categories.find((c) => c.code === catCode.toLowerCase());
       if (match) {
         handleCategorySelect(match);
       }
     }
-  }, [searchParams]);
+  }, [searchParams, categories]);
 
   const handleCategorySelect = async (cat) => {
     setSelectedCategory(cat);
@@ -161,20 +171,23 @@ export function Emergency() {
             </p>
 
             <div className="services-grid-4" style={{ marginBottom: 0 }}>
-              {CATEGORIES.map((cat) => (
-                <div
-                  key={cat.id}
-                  className={`emergency-card ${selectedCategory?.id === cat.id ? 'selected' : ''}`}
-                  onClick={() => handleCategorySelect(cat)}
-                >
-                  <div className="card-icon">{cat.icon}</div>
-                  <h3 className="card-title">{cat.name}</h3>
-                  <p className="card-desc">{cat.desc}</p>
-                  <button className="btn-primary" style={{ width: '100%', marginTop: '0.75rem' }}>
-                    Select {cat.name} ➔
-                  </button>
-                </div>
-              ))}
+              {categories.map((cat) => {
+                const meta = CATEGORIES_META[cat.code] || { icon: '🔧', desc: cat.description };
+                return (
+                  <div
+                    key={cat.id}
+                    className={`emergency-card ${selectedCategory?.id === cat.id ? 'selected' : ''}`}
+                    onClick={() => handleCategorySelect(cat)}
+                  >
+                    <div className="card-icon">{meta.icon}</div>
+                    <h3 className="card-title">{cat.name}</h3>
+                    <p className="card-desc">{meta.desc}</p>
+                    <button className="btn-primary" style={{ width: '100%', marginTop: '0.75rem' }}>
+                      Select {cat.name} ➔
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

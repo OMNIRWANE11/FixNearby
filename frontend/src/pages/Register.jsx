@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../components/Toast';
+import api from '../services/api';
 
 export function Register() {
   const [role, setRole] = useState('customer'); // customer or technician
@@ -10,12 +11,22 @@ export function Register() {
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [trade, setTrade] = useState('Licensed Electrician');
-  const [categoryId, setCategoryId] = useState(1);
+  const [categoryId, setCategoryId] = useState('');
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const { register } = useAuth();
   const navigate = useNavigate();
   const { showToast } = useToast();
+
+  useEffect(() => {
+    api.services.getCategories().then((res) => {
+      if (res.success && res.data) {
+        setCategories(res.data);
+        if (res.data.length > 0) setCategoryId(res.data[0].id);
+      }
+    }).catch(console.error);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -122,10 +133,11 @@ export function Register() {
                   Service Category Trade *
                 </label>
                 <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-                  <option value={1}>⚡ Electrical Emergency</option>
-                  <option value={2}>💧 Plumbing & Pipeline</option>
-                  <option value={3}>🚗 Automotive Breakdown</option>
-                  <option value={4}>🔐 Emergency Locksmith</option>
+                  {categories.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
