@@ -3,25 +3,25 @@ import { Link } from 'react-router-dom';
 
 const TEAM = [
   {
-    name: 'Aditya Deshpande',
+    name: 'Om Nirwane',
     role: 'Lead Full-Stack Architect',
     bio: 'Specialist in high-concurrency Flask APIs, PostGIS spatial algorithms, and crisis-response architectures.',
     tag: 'Project Core / Demo Member'
   },
   {
-    name: 'Tanvi Joshi',
+    name: 'Shreyas Parit',
     role: 'Senior Geospatial & UI/UX Designer',
     bio: 'Dedicated to high-contrast, crisis-optimized UI design systems and real-time Leaflet tracking experiences.',
     tag: 'Design Lead / Demo Member'
   },
   {
-    name: 'Kunal Patil',
+    name: 'Ritesh Patil',
     role: 'Distributed Systems & PostGIS Engineer',
     bio: 'Optimized spatial indexing, GeoAlchemy queries, and OSRM autonomous routing pipelines.',
     tag: 'Backend Lead / Demo Member'
   },
   {
-    name: 'Neha Kulkarni',
+    name: 'Tanishq Patil',
     role: 'PWA & Resilience Specialist',
     bio: 'Built service worker offline fallbacks, telemetry simulation, and WCAG AA accessibility compliance.',
     tag: 'PWA Engineer / Demo Member'

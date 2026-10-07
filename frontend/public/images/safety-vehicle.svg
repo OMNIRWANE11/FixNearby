@@ -1,10 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
-  <rect width="400" height="200" rx="12" fill="#1A1A1A"/>
   <circle cx="200" cy="80" r="45" fill="rgba(255, 176, 32, 0.15)" stroke="#FFB020" stroke-width="2"/>
   <path d="M175 88 L183 68 L217 68 L225 88 Z" fill="#FFB020"/>
-  <circle cx="180" cy="100" r="8" fill="#1A1A1A" stroke="#FFB020" stroke-width="3"/>
-  <circle cx="220" cy="100" r="8" fill="#1A1A1A" stroke="#FFB020" stroke-width="3"/>
+  <circle cx="180" cy="100" r="8" fill="#121212" stroke="#FFB020" stroke-width="3"/>
+  <circle cx="220" cy="100" r="8" fill="#121212" stroke="#FFB020" stroke-width="3"/>
   <text x="200" y="155" fill="#FAEBD7" font-family="sans-serif" font-weight="700" font-size="16" text-anchor="middle">ROADSIDE BREAKDOWN PROTOCOL</text>
-  <text x="200" y="175" fill="#858585" font-family="sans-serif" font-size="12" text-anchor="middle">Hazard Lights ON • Pull to Shoulder • Stay Clear</text>
+  <text x="200" y="175" fill="#858585" font-family="sans-serif" font-size="12" text-anchor="middle">Hazard Lights ON - Pull to Shoulder - Stay Clear</text>
 </svg>
-

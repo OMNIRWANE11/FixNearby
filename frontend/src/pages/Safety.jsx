@@ -127,7 +127,7 @@ export function Safety() {
             <img
               src={guide.image}
               alt={guide.title}
-              style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px' }}
+              style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '8px' }}
               loading="lazy"
             />
             

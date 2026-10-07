@@ -34,7 +34,7 @@
   <!-- Technician Marker -->
   <g transform="translate(160, 280)">
     <circle cx="0" cy="0" r="24" fill="#00F0FF" filter="drop-shadow(0 0 10px #00F0FF)"/>
-    <text x="0" y="8" font-size="20" text-anchor="middle" fill="#000">⚡</text>
+    <text x="0" y="8" font-size="20" font-family="sans-serif" text-anchor="middle" fill="#000">T</text>
   </g>
 
   <!-- Incident / Citizen Marker -->
@@ -51,4 +51,3 @@
     <text x="20" y="48" fill="#00F0FF" font-family="sans-serif" font-size="18" font-weight="900">ETA: 4 MIN (0.8 KM)</text>
   </g>
 </svg>
-
