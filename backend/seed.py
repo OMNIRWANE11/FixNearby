@@ -688,11 +688,28 @@ def seed_database():
             ("Clean work and transparent pricing. Paid directly via UPI without any surprise charges.", 5),
             ("Prompt arrival and diagnosed the short circuit immediately.", 4)
         ]
+        
+        import uuid
         for tech in created_techs:
             if tech.is_verified:
                 for idx, (comment, rating) in enumerate(reviews_data[:2]):
+                    req_id = str(uuid.uuid4())
+                    dummy_req = EmergencyRequest(
+                        id=req_id,
+                        user_id=customer_user.id,
+                        category_id=tech.category_id,
+                        customer_name="Verified Resident",
+                        customer_phone="9876543210",
+                        customer_address="Kolhapur City",
+                        customer_latitude=tech.current_latitude,
+                        customer_longitude=tech.current_longitude,
+                        status="COMPLETED",
+                        assigned_technician_id=tech.id
+                    )
+                    db.session.add(dummy_req)
+                    
                     rev = Review(
-                        request_id=f"rev-{tech.badge_code}-{idx}",
+                        request_id=req_id,
                         technician_id=tech.id,
                         user_id=customer_user.id,
                         customer_name="Verified Resident",
