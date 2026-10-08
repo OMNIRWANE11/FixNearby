@@ -24,7 +24,14 @@ class EmergencyRequest(db.Model):
     customer_longitude = db.Column(db.Float, nullable=False)
 
     if Geography is not None:
-        customer_location = db.Column(Geography(geometry_type='POINT', srid=4326), nullable=True)
+        try:
+            from app.config import get_database_uri
+            if "sqlite" in get_database_uri():
+                customer_location = None
+            else:
+                customer_location = db.Column(Geography(geometry_type='POINT', srid=4326), nullable=True)
+        except Exception:
+            customer_location = None
     else:
         customer_location = None
 

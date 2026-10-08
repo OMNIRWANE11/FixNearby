@@ -30,7 +30,14 @@ class Technician(db.Model):
 
     # PostGIS Geography Column (if available in PostgreSQL environment)
     if Geography is not None:
-        current_location = db.Column(Geography(geometry_type='POINT', srid=4326, spatial_index=True), nullable=True)
+        try:
+            from app.config import get_database_uri
+            if "sqlite" in get_database_uri():
+                current_location = None
+            else:
+                current_location = db.Column(Geography(geometry_type='POINT', srid=4326, spatial_index=True), nullable=True)
+        except Exception:
+            current_location = None
     else:
         current_location = None
 
