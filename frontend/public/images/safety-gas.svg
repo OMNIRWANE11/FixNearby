@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
+  <rect width="400" height="200" fill="#1A1A1A" rx="8" />
   <circle cx="200" cy="80" r="45" fill="rgba(255, 51, 51, 0.15)" stroke="#FF3333" stroke-width="2"/>
-  <path d="M200 50 C190 70 185 85 185 95 C185 105 192 112 200 112 C208 112 215 105 215 95 C215 85 210 70 200 50 Z" fill="#FF3333"/>
-  <text x="200" y="155" fill="#FAEBD7" font-family="sans-serif" font-weight="700" font-size="16" text-anchor="middle">GAS LEAK EMERGENCY PROTOCOL</text>
-  <text x="200" y="175" fill="#858585" font-family="sans-serif" font-size="12" text-anchor="middle">No Electrical Switches - Open Windows - Evacuate</text>
+  <path d="M190 50 C190 50, 180 70, 195 80 C210 90, 200 110, 200 110 C200 110, 220 90, 205 80 C190 70, 210 50, 190 50 Z" fill="#FF3333"/>
+  <text x="200" y="155" fill="#FAEBD7" font-family="sans-serif" font-weight="700" font-size="16" text-anchor="middle">GAS LEAK PROTOCOL</text>
 </svg>
