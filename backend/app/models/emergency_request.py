@@ -3,7 +3,8 @@ from datetime import datetime
 from app.extensions import db
 
 try:
-    from geoalchemy2 import Geography
+    # from geoalchemy2 import Geography
+    Geography = None
 except ImportError:
     Geography = None
 
