@@ -4,7 +4,7 @@ from app.extensions import db
 class LocationLog(db.Model):
     __tablename__ = "location_logs"
 
-    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer().with_variant(db.BigInteger(), "postgresql"), primary_key=True, autoincrement=True)
     technician_id = db.Column(db.String(36), db.ForeignKey("technicians.id", ondelete="CASCADE"), nullable=False, index=True)
     request_id = db.Column(db.String(36), db.ForeignKey("emergency_requests.id", ondelete="CASCADE"), nullable=True, index=True)
     latitude = db.Column(db.Float, nullable=False)

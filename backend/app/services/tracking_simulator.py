@@ -1,7 +1,10 @@
 import time
 import threading
 import json
+import logging
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 from typing import Dict, Any, List, Optional
 from flask import current_app
 from app.extensions import db, socketio
@@ -146,7 +149,7 @@ def _simulation_worker(app, request_id: str, stop_event: threading.Event):
                 time.sleep(2.5)
 
         except Exception as e:
-            pass
+            logger.error(f"Tracking simulation error for {request_id}: {e}", exc_info=True)
         finally:
             with _SIMULATION_LOCK:
                 if request_id in _ACTIVE_SIMULATIONS:

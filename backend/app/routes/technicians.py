@@ -3,6 +3,7 @@ from sqlalchemy import or_
 from marshmallow import ValidationError
 from app.models.technician import Technician
 from app.models.service_category import ServiceCategory
+from app.models.review import Review
 from app.schemas.technician_schema import TechnicianFilterSchema
 from app.services.geo_service import haversine_distance_km, estimate_eta_minutes
 from app.utils.errors import api_response, api_error
@@ -113,6 +114,6 @@ def get_technician_detail(tech_id):
         eta = estimate_eta_minutes(dist)
 
     data = tech.to_dict(include_credentials=True, distance_km=dist, eta_minutes=eta)
-    data["reviews"] = [r.to_dict() for r in tech.reviews.order_by(tech.reviews.model.created_at.desc()).limit(10).all()]
+    data["reviews"] = [r.to_dict() for r in tech.reviews.order_by(Review.created_at.desc()).limit(10).all()]
     return api_response(data)
 

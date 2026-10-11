@@ -6,21 +6,21 @@ class RegisterSchema(Schema):
     fullName = fields.String(required=True, validate=validate.Length(min=2, max=150))
     phone = fields.String(required=True, validate=validate.Length(min=7, max=25))
     role = fields.String(load_default="customer", validate=validate.OneOf(["customer", "technician"]))
-    savedAddress = fields.String(load_default=None)
-    savedLatitude = fields.Float(load_default=None)
-    savedLongitude = fields.Float(load_default=None)
+    savedAddress = fields.String(load_default=None, allow_none=True)
+    savedLatitude = fields.Float(load_default=None, allow_none=True)
+    savedLongitude = fields.Float(load_default=None, allow_none=True)
     
     # Optional technician fields if registering directly as technician
-    categoryId = fields.Integer(load_default=None)
-    trade = fields.String(load_default=None)
+    categoryId = fields.Integer(load_default=None, allow_none=True)
+    trade = fields.String(load_default=None, allow_none=True)
     experienceYears = fields.Integer(load_default=1)
     operatingRadiusKm = fields.Float(load_default=15.0)
-    shopName = fields.String(load_default=None)
-    shopAddress = fields.String(load_default=None)
-    shopContact = fields.String(load_default=None)
-    educationDegree = fields.String(load_default=None)
-    certifications = fields.String(load_default=None)
-    licenseNumber = fields.String(load_default=None)
+    shopName = fields.String(load_default=None, allow_none=True)
+    shopAddress = fields.String(load_default=None, allow_none=True)
+    shopContact = fields.String(load_default=None, allow_none=True)
+    educationDegree = fields.String(load_default=None, allow_none=True)
+    certifications = fields.String(load_default=None, allow_none=True)
+    licenseNumber = fields.String(load_default=None, allow_none=True)
 
 class LoginSchema(Schema):
     email = fields.Email(required=True)
@@ -29,7 +29,7 @@ class LoginSchema(Schema):
 class ProfileUpdateSchema(Schema):
     fullName = fields.String(validate=validate.Length(min=2, max=150))
     phone = fields.String(validate=validate.Length(min=7, max=25))
-    savedAddress = fields.String()
-    savedLatitude = fields.Float()
-    savedLongitude = fields.Float()
+    savedAddress = fields.String(allow_none=True)
+    savedLatitude = fields.Float(allow_none=True)
+    savedLongitude = fields.Float(allow_none=True)
 
