@@ -119,11 +119,14 @@ export function Tracking() {
     e.preventDefault();
     setSubmittingReview(true);
     try {
+      if (trackingData?.status !== 'COMPLETED') {
+        await api.requests.updateStatus(requestId, { status: 'COMPLETED' });
+      }
       await api.requests.review(requestId, {
         rating: ratingVal,
         comment: reviewComment.trim(),
       });
-      showToast('Thank you! Your verified review has been published.', 'success');
+      showToast('Thank you! Job completed and review published.', 'success');
       setShowReviewModal(false);
       navigate('/requests');
     } catch (err) {
@@ -212,9 +215,20 @@ export function Tracking() {
             <button
               type="button"
               className="btn-secondary"
-              onClick={() => setShowReviewModal(false)}
+              onClick={async () => {
+                try {
+                  if (trackingData?.status !== 'COMPLETED') {
+                    await api.requests.updateStatus(requestId, { status: 'COMPLETED' });
+                    showToast('Job marked as completed.', 'success');
+                  }
+                } catch (err) {
+                  showToast('Failed to update status.', 'error');
+                }
+                setShowReviewModal(false);
+                navigate('/requests');
+              }}
             >
-              Skip For Now
+              Complete & Skip Review
             </button>
             <button type="submit" className="btn-primary" disabled={submittingReview}>
               {submittingReview ? 'Submitting...' : 'Submit Review ✓'}

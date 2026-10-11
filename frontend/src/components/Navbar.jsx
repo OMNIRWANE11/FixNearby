@@ -20,11 +20,12 @@ export function Navbar() {
 
   return (
     <header className={`navbar ${isCompact ? 'compact' : ''}`}>
-      <div className="container navbar-inner">
+      <div className="navbar-container">
         {/* Brand Logo */}
         <Link to="/" className="brand-logo" aria-label="FixNearby Home">
-          <span>FIXNEARBY</span>
-          <span className="brand-dot">.</span>
+          <span className="brand-logo-badge">⚡</span>
+          <span className="brand-name">FIXNEARBY</span>
+          <span className="brand-dot"></span>
         </Link>
 
         {/* Desktop Navigation Links */}
@@ -41,8 +42,13 @@ export function Navbar() {
               </NavLink>
             </li>
             <li>
-              <NavLink to="/emergency" className={({ isActive }) => (isActive ? 'active' : '')}>
-                Emergency SOS
+              <NavLink to="/emergency" className={({ isActive }) => `nav-link-sos ${isActive ? 'active' : ''}`}>
+                🚨 Emergency SOS
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/requests" className={({ isActive }) => (isActive ? 'active' : '')}>
+                My Requests
               </NavLink>
             </li>
             <li>
@@ -73,12 +79,14 @@ export function Navbar() {
 
           {/* User / Provider Login */}
           {isAuthenticated ? (
-            <Link to={user.role === 'technician' ? '/provider' : '/profile'} className="btn-secondary" style={{ minHeight: '40px', padding: '0 1rem', fontSize: '0.9rem' }}>
-              {user.role === 'technician' ? 'Provider Portal' : 'My Account'}
+            <Link to={user.role === 'technician' ? '/provider' : '/profile'} className="nav-account-btn">
+              <span>👤</span>
+              <span>{user.role === 'technician' ? 'Provider Portal' : 'My Account'}</span>
             </Link>
           ) : (
-            <Link to="/login" className="btn-secondary btn-provider-link" style={{ minHeight: '40px', padding: '0 1rem', fontSize: '0.9rem' }}>
-              Provider Login
+            <Link to="/login" className="nav-account-btn btn-provider-link">
+              <span>👤</span>
+              <span>Provider Login</span>
             </Link>
           )}
 
@@ -88,7 +96,7 @@ export function Navbar() {
             className="btn-nav-sos"
             aria-label="Trigger SOS Emergency Repair"
           >
-            SOS
+            <span>🚨 SOS</span>
           </button>
         </div>
       </div>

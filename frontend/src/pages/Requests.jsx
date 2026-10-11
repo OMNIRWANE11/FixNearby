@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EmergencyRequestCard from '../components/EmergencyRequestCard';
+import RequestHistoryModal from '../components/RequestHistoryModal';
 import Loader from '../components/Loader';
 import EmptyState from '../components/EmptyState';
 import { useAuth } from '../hooks/useAuth';
@@ -11,6 +12,7 @@ export function Requests() {
   const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedHistoryRequest, setSelectedHistoryRequest] = useState(null);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -34,6 +36,21 @@ export function Requests() {
     }
     loadUserRequests();
   }, [isAuthenticated]);
+
+  const handleReviewSubmitted = (requestId, newReview) => {
+    setRequests((prev) =>
+      prev.map((r) =>
+        r.id === requestId
+          ? { ...r, hasReview: true, review: newReview }
+          : r
+      )
+    );
+    setSelectedHistoryRequest((prev) =>
+      prev && prev.id === requestId
+        ? { ...prev, hasReview: true, review: newReview }
+        : prev
+    );
+  };
 
   if (authLoading || loading) return <Loader label="Loading your past emergency requests..." />;
 
@@ -85,11 +102,24 @@ export function Requests() {
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
               {past.map((req) => (
-                <EmergencyRequestCard key={req.id} request={req} />
+                <EmergencyRequestCard
+                  key={req.id}
+                  request={req}
+                  onOpenDetails={(r) => setSelectedHistoryRequest(r)}
+                />
               ))}
             </div>
           </section>
         </div>
+      )}
+
+      {/* History Detail & Review Modal Popup */}
+      {selectedHistoryRequest && (
+        <RequestHistoryModal
+          request={selectedHistoryRequest}
+          onClose={() => setSelectedHistoryRequest(null)}
+          onReviewSubmitted={handleReviewSubmitted}
+        />
       )}
     </div>
   );

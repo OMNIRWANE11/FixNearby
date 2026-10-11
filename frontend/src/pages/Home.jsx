@@ -296,7 +296,7 @@ export function Home() {
         <TechnicianProfile
           technician={selectedProfile}
           onClose={() => setSelectedProfile(null)}
-          onRequestHelp={(tech) => navigate(`/emergency?category=${tech.trade.toLowerCase()}`)}
+          onRequestHelp={(tech) => navigate(`/emergency?category=${(tech.categoryName || '').toLowerCase()}`)}
         />
       )}
     </div>

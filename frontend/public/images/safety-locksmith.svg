@@ -1,7 +1,7 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
   <rect width="400" height="200" fill="#1A1A1A" rx="8" />
   <circle cx="200" cy="80" r="45" fill="rgba(255, 176, 32, 0.15)" stroke="#FFB020" stroke-width="2"/>
   <path d="M190 65 C190 60, 210 60, 210 65 L210 75 L190 75 Z" fill="none" stroke="#FFB020" stroke-width="4"/>
   <rect x="185" y="75" width="30" height="30" rx="4" fill="#FFB020"/>
-  <text x="200" y="155" fill="#FAEBD7" font-family="sans-serif" font-weight="700" font-size="16" text-anchor="middle">LOCKSMITH & SECURITY</text>
+  <text x="200" y="155" fill="#FAEBD7" font-family="sans-serif" font-weight="700" font-size="16" text-anchor="middle">LOCKSMITH &amp; SECURITY</text>
 </svg>

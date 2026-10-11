@@ -1,6 +1,7 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
   <rect width="400" height="200" fill="#1A1A1A" rx="8" />
   <circle cx="200" cy="80" r="45" fill="rgba(255, 51, 51, 0.15)" stroke="#FF3333" stroke-width="2"/>
   <path d="M190 50 C190 50, 180 70, 195 80 C210 90, 200 110, 200 110 C200 110, 220 90, 205 80 C190 70, 210 50, 190 50 Z" fill="#FF3333"/>
   <text x="200" y="155" fill="#FAEBD7" font-family="sans-serif" font-weight="700" font-size="16" text-anchor="middle">GAS LEAK PROTOCOL</text>
 </svg>
+

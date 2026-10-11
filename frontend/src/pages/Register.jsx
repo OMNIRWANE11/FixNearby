@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../components/Toast';
 import api from '../services/api';
@@ -10,8 +10,20 @@ export function Register() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
-  const [trade, setTrade] = useState('Licensed Electrician');
+  const [trade, setTrade] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [experienceYears, setExperienceYears] = useState(1);
+  const [operatingRadiusKm, setOperatingRadiusKm] = useState(15);
+  const [savedAddress, setSavedAddress] = useState('');
+  
+  // New technician fields
+  const [shopName, setShopName] = useState('');
+  const [shopAddress, setShopAddress] = useState('');
+  const [shopContact, setShopContact] = useState('');
+  const [educationDegree, setEducationDegree] = useState('');
+  const [certifications, setCertifications] = useState('');
+  const [licenseNumber, setLicenseNumber] = useState('');
+
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -19,14 +31,29 @@ export function Register() {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get('redirect') || '/';
+
   useEffect(() => {
     api.services.getCategories().then((res) => {
       if (res.success && res.data) {
         setCategories(res.data);
-        if (res.data.length > 0) setCategoryId(res.data[0].id);
+        if (res.data.length > 0) {
+          setCategoryId(res.data[0].id);
+          setTrade(res.data[0].name);
+        }
       }
     }).catch(console.error);
   }, []);
+
+  const handleCategoryChange = (e) => {
+    const newId = e.target.value;
+    setCategoryId(newId);
+    const cat = categories.find(c => c.id.toString() === newId.toString());
+    if (cat) {
+      setTrade(cat.name);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,7 +65,19 @@ export function Register() {
         fullName: fullName.trim(),
         phone: phone.trim(),
         role,
-        ...(role === 'technician' ? { trade, categoryId: Number(categoryId) } : {}),
+        savedAddress: savedAddress.trim() || undefined,
+        ...(role === 'technician' ? { 
+          trade, 
+          categoryId: Number(categoryId),
+          experienceYears: Number(experienceYears),
+          operatingRadiusKm: Number(operatingRadiusKm),
+          shopName: shopName.trim() || undefined,
+          shopAddress: shopAddress.trim() || undefined,
+          shopContact: shopContact.trim() || undefined,
+          educationDegree: educationDegree.trim() || undefined,
+          certifications: certifications.trim() || undefined,
+          licenseNumber: licenseNumber.trim() || undefined
+        } : {}),
       };
 
       const user = await register(payload);
@@ -46,7 +85,7 @@ export function Register() {
       if (user.role === 'technician') {
         navigate('/provider');
       } else {
-        navigate('/');
+        navigate(redirectUrl);
       }
     } catch (err) {
       showToast(err.message || 'Registration failed.', 'error');
@@ -125,33 +164,149 @@ export function Register() {
             />
           </div>
 
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
+              Residential / Base Address
+            </label>
+            <input
+              type="text"
+              value={savedAddress}
+              onChange={(e) => setSavedAddress(e.target.value)}
+              placeholder="e.g. 123 Main St, Kolhapur"
+            />
+          </div>
+
           {/* Technician Specific Fields */}
           {role === 'technician' && (
             <>
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
-                  Service Category Trade *
-                </label>
-                <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-                  {categories.map(c => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
+                    Service Category Trade *
+                  </label>
+                  <select value={categoryId} onChange={handleCategoryChange} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-color)', color: 'var(--text-primary)' }}>
+                    {categories.map(c => (
+                      <option key={c.id} value={c.id} style={{ background: 'var(--surface-1)', color: 'var(--text-primary)' }}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
+                    Years of Experience *
+                  </label>
+                  <input
+                    type="number"
+                    value={experienceYears}
+                    onChange={(e) => setExperienceYears(e.target.value)}
+                    min="1"
+                    required
+                  />
+                </div>
               </div>
 
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
-                  Trade Title / Specialization *
-                </label>
-                <input
-                  type="text"
-                  value={trade}
-                  onChange={(e) => setTrade(e.target.value)}
-                  placeholder="e.g. Master Licensed Electrician"
-                  required
-                />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
+                    Trade Title / Specialization *
+                  </label>
+                  <input
+                    type="text"
+                    value={trade}
+                    onChange={(e) => setTrade(e.target.value)}
+                    placeholder="e.g. Master Licensed Electrician"
+                    required
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
+                    Operating Radius (km) *
+                  </label>
+                  <input
+                    type="number"
+                    value={operatingRadiusKm}
+                    onChange={(e) => setOperatingRadiusKm(e.target.value)}
+                    min="1"
+                    max="100"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '1rem', padding: '1rem', background: 'var(--surface-2)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                <h4 style={{ marginBottom: '0.75rem', fontSize: '0.95rem', color: 'var(--text-primary)' }}>Professional & Shop Details</h4>
+                <div style={{ marginBottom: '0.75rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
+                    Trade / Govt License Number *
+                  </label>
+                  <input
+                    type="text"
+                    value={licenseNumber}
+                    onChange={(e) => setLicenseNumber(e.target.value)}
+                    placeholder="Mandatory for verification"
+                    required
+                  />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.75rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
+                      Shop/Business Name (if any)
+                    </label>
+                    <input
+                      type="text"
+                      value={shopName}
+                      onChange={(e) => setShopName(e.target.value)}
+                      placeholder="e.g. Star Electricals"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
+                      Shop Contact Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={shopContact}
+                      onChange={(e) => setShopContact(e.target.value)}
+                      placeholder="e.g. +91231XXXXXXX"
+                    />
+                  </div>
+                </div>
+                <div style={{ marginBottom: '0.75rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
+                    Shop Address
+                  </label>
+                  <input
+                    type="text"
+                    value={shopAddress}
+                    onChange={(e) => setShopAddress(e.target.value)}
+                    placeholder="Full shop address"
+                  />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
+                      Education Degree (Relevant)
+                    </label>
+                    <input
+                      type="text"
+                      value={educationDegree}
+                      onChange={(e) => setEducationDegree(e.target.value)}
+                      placeholder="e.g. ITI, Diploma in Plumbing"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
+                      Other Certifications
+                    </label>
+                    <input
+                      type="text"
+                      value={certifications}
+                      onChange={(e) => setCertifications(e.target.value)}
+                      placeholder="e.g. ISO 9001, Safety Cert"
+                    />
+                  </div>
+                </div>
               </div>
             </>
           )}
@@ -177,7 +332,7 @@ export function Register() {
 
         <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem' }}>
           Already have an account?{' '}
-          <Link to="/login" style={{ color: 'var(--accent-aqua)', fontWeight: 600 }}>
+          <Link to={`/login?redirect=${encodeURIComponent(redirectUrl)}`} style={{ color: 'var(--accent-aqua)', fontWeight: 600 }}>
             Sign In
           </Link>
         </div>

@@ -7,6 +7,7 @@ export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState('customer');
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -48,6 +49,26 @@ export function Login() {
       </div>
 
       <div style={{ background: 'var(--surface-1)', padding: '2rem', borderRadius: '16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-lg)' }}>
+        {/* Role Selection Tabs for Login */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '1.5rem' }}>
+          <button
+            type="button"
+            className={role === 'customer' ? 'btn-primary' : 'btn-secondary'}
+            onClick={() => setRole('customer')}
+            style={{ fontSize: '0.9rem' }}
+          >
+            👤 Citizen / Customer
+          </button>
+          <button
+            type="button"
+            className={role === 'technician' ? 'btn-primary' : 'btn-secondary'}
+            onClick={() => setRole('technician')}
+            style={{ fontSize: '0.9rem' }}
+          >
+            🛠️ Technician Provider
+          </button>
+        </div>
+
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1.25rem' }}>
             <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
@@ -57,7 +78,7 @@ export function Login() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. rajesh.patil@fixnearby.local"
+              placeholder={role === 'technician' ? "e.g. rajesh.patil@fixnearby.local" : "e.g. citizen@fixnearby.local"}
               required
             />
           </div>
@@ -76,7 +97,7 @@ export function Login() {
           </div>
 
           <button type="submit" className="btn-primary" style={{ width: '100%' }} disabled={loading}>
-            {loading ? 'Authenticating...' : 'Sign In ➔'}
+            {loading ? 'Authenticating...' : `Sign In as ${role === 'technician' ? 'Provider' : 'Customer'} ➔`}
           </button>
         </form>
 
@@ -86,22 +107,25 @@ export function Login() {
             Demo Fast-Login Credentials:
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={() => handleFillDemo('rajesh.patil@fixnearby.local', 'TechPass@123')}
-              style={{ minHeight: '36px', fontSize: '0.8rem', justifyContent: 'flex-start' }}
-            >
-              ⚡ Provider: Rajesh Patil (FN-88492)
-            </button>
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={() => handleFillDemo('citizen@fixnearby.local', 'CitizenPass@123')}
-              style={{ minHeight: '36px', fontSize: '0.8rem', justifyContent: 'flex-start' }}
-            >
-              👤 Citizen: Ananya Sharma
-            </button>
+            {role === 'technician' ? (
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => handleFillDemo('rajesh.patil@fixnearby.local', 'TechPass@123')}
+                style={{ minHeight: '36px', fontSize: '0.8rem', justifyContent: 'flex-start' }}
+              >
+                ⚡ Provider: Rajesh Patil (FN-88492)
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => handleFillDemo('citizen@fixnearby.local', 'CitizenPass@123')}
+                style={{ minHeight: '36px', fontSize: '0.8rem', justifyContent: 'flex-start' }}
+              >
+                👤 Citizen: Ananya Sharma
+              </button>
+            )}
             <button
               type="button"
               className="btn-secondary"
@@ -115,7 +139,7 @@ export function Login() {
 
         <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem' }}>
           Don't have an account yet?{' '}
-          <Link to="/register" style={{ color: 'var(--accent-aqua)', fontWeight: 600 }}>
+          <Link to={`/register?redirect=${encodeURIComponent(redirectUrl)}`} style={{ color: 'var(--accent-aqua)', fontWeight: 600 }}>
             Register here
           </Link>
         </div>

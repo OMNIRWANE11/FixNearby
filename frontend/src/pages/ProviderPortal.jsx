@@ -9,7 +9,7 @@ import { useToast } from '../components/Toast';
 import api from '../services/api';
 
 export function ProviderPortal() {
-  const { user, isTechnician, isAuthenticated } = useAuth();
+  const { user, isTechnician, isAuthenticated, logout, setUser } = useAuth();
   const { location } = useGeolocation();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -81,6 +81,13 @@ export function ProviderPortal() {
       const res = await api.provider.toggleDuty(nextState);
       if (res.success) {
         setIsOnDuty(nextState);
+        setUser(prevUser => ({
+          ...prevUser,
+          technician: {
+            ...prevUser.technician,
+            isOnDuty: nextState
+          }
+        }));
         showToast(`You are now ${nextState ? 'ONLINE & receiving emergency calls' : 'OFFLINE'}`, nextState ? 'success' : 'info');
       }
     } catch (err) {
@@ -124,13 +131,32 @@ export function ProviderPortal() {
           </div>
         </div>
 
-        {/* Large Duty Switch Button */}
-        <div>
+        {/* Large Duty Switch Button & Logout */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-end' }}>
           <button
             className={`duty-toggle-btn ${isOnDuty ? 'online' : 'offline'}`}
             onClick={handleToggleDuty}
           >
             {isOnDuty ? '🟢 ONLINE & ACTIVE' : '⚪ GO ON DUTY'}
+          </button>
+          
+          <button 
+            onClick={() => {
+              logout();
+              navigate('/login');
+              showToast('Logged out successfully', 'info');
+            }}
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--border)',
+              color: 'var(--text-secondary)',
+              padding: '0.4rem 1rem',
+              borderRadius: '6px',
+              fontSize: '0.85rem',
+              cursor: 'pointer'
+            }}
+          >
+            Log Out
           </button>
         </div>
       </div>

@@ -11,6 +11,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../components/Toast';
 import { formatDistance, formatEta } from '../utils/formatters';
 import api from '../services/api';
+import TechnicianProfile from '../components/TechnicianProfile';
 
 const CATEGORIES_META = {
   electrical: { icon: '⚡', desc: 'Short circuit, sparks, MCB trip, wiring fault' },
@@ -23,8 +24,15 @@ export function Emergency() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { location, requestGpsLocation, setManualLocation, gpsStatus } = useGeolocation();
-  const { user } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const { showToast } = useToast();
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      const currentUrl = '/emergency' + window.location.search;
+      navigate(`/login?redirect=${encodeURIComponent(currentUrl)}`);
+    }
+  }, [isAuthenticated, authLoading, navigate]);
 
   const [categories, setCategories] = useState([]);
   const [step, setStep] = useState(1);
@@ -38,6 +46,7 @@ export function Emergency() {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dispatchResult, setDispatchResult] = useState(null);
+  const [selectedProfile, setSelectedProfile] = useState(null);
 
   // Fetch categories on mount
   useEffect(() => {
@@ -142,6 +151,10 @@ export function Emergency() {
       navigate(`/tracking/${dispatchResult.request.id}`);
     }
   };
+
+  if (authLoading || !isAuthenticated) {
+    return <Loader label="Verifying account credentials..." />;
+  }
 
   return (
     <div className="container emergency-page-container">
@@ -380,7 +393,18 @@ export function Emergency() {
 
             <div className="tech-cards-grid">
               {dispatchResult.candidates?.map((tech) => (
-                <div key={tech.id} className="tech-card" style={{ borderColor: 'var(--accent-aqua)' }}>
+                <div
+                  key={tech.id}
+                  className="tech-card"
+                  style={{
+                    borderColor: 'var(--accent-aqua)',
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    position: 'relative'
+                  }}
+                  onClick={() => setSelectedProfile(tech)}
+                  title="Click to view full technician details before selecting"
+                >
                   <div className="tech-card-header">
                     <img
                       src={tech.profileImageUrl || '/images/technicians/tech-default.svg'}
@@ -414,19 +438,66 @@ export function Emergency() {
                     </div>
                   </div>
 
-                  <button
-                    className="btn-sos"
-                    onClick={() => handleSelectTechnician(tech)}
-                    style={{ width: '100%', minHeight: '48px', fontSize: '1rem' }}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1.6fr',
+                      gap: '0.6rem',
+                      marginTop: '0.85rem'
+                    }}
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    SELECT TECHNICIAN & START LIVE TRACKING ➔
-                  </button>
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      onClick={() => setSelectedProfile(tech)}
+                      style={{
+                        minHeight: '46px',
+                        fontSize: '0.88rem',
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.35rem',
+                        padding: '0 0.5rem'
+                      }}
+                      title="View full credentials, shop, reviews, and experience"
+                    >
+                      👁️ View Info
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-sos"
+                      onClick={() => handleSelectTechnician(tech)}
+                      style={{
+                        minHeight: '46px',
+                        fontSize: '0.88rem',
+                        fontWeight: 700,
+                        padding: '0 0.5rem'
+                      }}
+                    >
+                      SELECT & TRACK ➔
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
       </div>
+
+      {/* Pop-up Profile Modal to inspect worker info before selecting */}
+      {selectedProfile && (
+        <TechnicianProfile
+          technician={selectedProfile}
+          onClose={() => setSelectedProfile(null)}
+          actionButtonLabel="SELECT TECHNICIAN & START LIVE TRACKING ➔"
+          onSelect={(tech) => {
+            setSelectedProfile(null);
+            handleSelectTechnician(tech);
+          }}
+        />
+      )}
     </div>
   );
 }

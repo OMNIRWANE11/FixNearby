@@ -59,8 +59,8 @@ export function TechnicianCard({ technician, onSelect, onOpenProfile }) {
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{technician.trade}</p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem' }}>
             <span className="tech-badge-id">{technician.badgeCode}</span>
-            <span style={{ fontSize: '0.8rem', color: technician.isOnDuty ? 'var(--accent-aqua)' : 'var(--text-muted)' }}>
-              • {technician.isOnDuty ? '🟢 On Duty' : '⚪ Off Duty'}
+            <span style={{ fontSize: '0.8rem', color: technician.isBusy ? 'var(--warning)' : technician.isOnDuty ? 'var(--accent-aqua)' : 'var(--text-muted)' }}>
+              • {technician.isBusy ? '🟡 Busy' : technician.isOnDuty ? '🟢 On Duty' : '⚪ Off Duty'}
             </span>
           </div>
         </div>
@@ -127,10 +127,17 @@ export function TechnicianCard({ technician, onSelect, onOpenProfile }) {
         {onSelect && (
           <button
             className="btn-sos tech-full-width-action"
-            style={{ minHeight: '44px', fontSize: '0.95rem' }}
-            onClick={() => onSelect(technician)}
+            style={{ minHeight: '44px', fontSize: '0.95rem', opacity: technician.isBusy ? 0.6 : 1, cursor: technician.isBusy ? 'not-allowed' : 'pointer' }}
+            onClick={(e) => {
+              if (technician.isBusy) {
+                e.stopPropagation();
+                return;
+              }
+              onSelect(technician);
+            }}
+            disabled={technician.isBusy}
           >
-            Select For Emergency SOS ➔
+            {technician.isBusy ? 'Currently Busy ⏳' : 'Select For Emergency SOS ➔'}
           </button>
         )}
       </div>

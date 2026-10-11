@@ -117,7 +117,7 @@ export function Directory() {
         <TechnicianProfile
           technician={selectedProfile}
           onClose={() => setSelectedProfile(null)}
-          onRequestHelp={(t) => navigate(`/emergency?category=${t.trade.toLowerCase()}`)}
+          onRequestHelp={(t) => navigate(`/emergency?category=${(t.categoryName || '').toLowerCase()}`)}
         />
       )}
     </div>

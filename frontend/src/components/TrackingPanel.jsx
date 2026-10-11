@@ -107,11 +107,12 @@ export function TrackingPanel({ trackingData, onCancelRequest, onCompleteReview,
 
       {/* Review / Cancel Actions */}
       <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        {status === 'ARRIVED' || status === 'COMPLETED' ? (
+        {['ASSIGNED', 'ON_THE_WAY', 'ARRIVED', 'COMPLETED'].includes(status) && (
           <button className="btn-primary" onClick={onCompleteReview}>
             ⭐ Leave Review & Complete Job
           </button>
-        ) : (
+        )}
+        {['PENDING', 'ASSIGNED', 'ON_THE_WAY'].includes(status) && (
           <button
             className="btn-secondary"
             style={{ color: 'var(--alert-red)', borderColor: 'rgba(255,51,51,0.3)' }}

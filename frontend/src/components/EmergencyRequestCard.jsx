@@ -2,15 +2,30 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDateTime, formatDistance } from '../utils/formatters';
 
-export function EmergencyRequestCard({ request }) {
+export function EmergencyRequestCard({ request, onOpenDetails }) {
   const navigate = useNavigate();
   if (!request) return null;
 
   const isCompleted = request.status === 'COMPLETED';
   const isCancelled = request.status === 'CANCELLED';
+  const isPast = isCompleted || isCancelled;
+
+  const handleAction = () => {
+    if (isPast) {
+      if (onOpenDetails) onOpenDetails(request);
+    } else {
+      navigate(`/tracking/${request.id}`);
+    }
+  };
+
+  const hasReview = Boolean(request.hasReview || request.review);
 
   return (
-    <div className="emergency-card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/tracking/${request.id}`)}>
+    <div
+      className="emergency-card"
+      style={{ cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s' }}
+      onClick={handleAction}
+    >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
         <div>
           <span className="badge-tag" style={{ background: request.severity === 'CRITICAL' ? 'var(--alert-red-dim)' : 'var(--warning-dim)', color: request.severity === 'CRITICAL' ? 'var(--alert-red)' : 'var(--warning)' }}>
@@ -45,10 +60,21 @@ export function EmergencyRequestCard({ request }) {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
         <span style={{ fontSize: '0.85rem', color: 'var(--accent-aqua)' }}>
-          {request.distanceKm ? `${formatDistance(request.distanceKm)} distance` : 'View Dispatch Track'}
+          {request.distanceKm ? `${formatDistance(request.distanceKm)} distance` : isCompleted ? 'Service Complete' : 'View Dispatch Track'}
         </span>
-        <button className="btn-secondary" style={{ minHeight: '36px', fontSize: '0.85rem', padding: '0 0.75rem' }}>
-          View Tracking ➔
+        <button
+          className={isPast ? "btn-secondary" : "btn-sos"}
+          style={{ minHeight: '36px', fontSize: '0.85rem', padding: '0 0.85rem' }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleAction();
+          }}
+        >
+          {isCompleted
+            ? (hasReview ? '📋 View Summary' : '⭐ Review & Summary')
+            : isCancelled
+            ? '📋 View Details'
+            : 'Live Tracking ➔'}
         </button>
       </div>
     </div>
