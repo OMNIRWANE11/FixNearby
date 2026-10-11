@@ -159,6 +159,9 @@ export function Tracking() {
           userLocation={trackingData.customerLocation}
           technicianLocation={techPosition}
           routeCoordinates={routeCoords}
+          etaMinutes={trackingData.etaMinutes}
+          distanceRemainingKm={trackingData.distanceRemainingKm}
+          status={trackingData.status}
           height="100%"
         />
       </div>

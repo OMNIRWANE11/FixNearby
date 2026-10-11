@@ -1,0 +1,578 @@
+/* ============================================================
+   FIXNEARBY — MODERN LEAFLET MAP STYLES & CONTROLS
+   High-contrast, attractive, glassmorphic UI for live tracking
+   ============================================================ */
+
+/* 1. Map Container */
+.map-view-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background-color: #0b0f19;
+}
+
+.map-view-container .leaflet-container {
+  width: 100%;
+  height: 100%;
+  background: #0d121f !important;
+  font-family: inherit;
+  outline: none;
+}
+
+/* Watermark-Free Tile Filters */
+.map-tiles-dark {
+  filter: brightness(0.65) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.75);
+}
+
+.map-tiles-streets {
+  filter: none;
+}
+
+.map-tiles-satellite {
+  filter: none;
+}
+
+/* Remove default harsh leaflet zoom bar in favor of modern custom floating controls */
+.leaflet-bar {
+  border: none !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+}
+
+.leaflet-bar a {
+  background-color: rgba(18, 24, 38, 0.9) !important;
+  color: #e2e8f0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(8px);
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  transition: all 0.2s ease;
+}
+
+.leaflet-bar a:hover {
+  background-color: rgba(0, 240, 255, 0.2) !important;
+  color: #00F0FF !important;
+}
+
+/* 2. Custom Marker Styles & Radar Pulse */
+.map-marker-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Radar pulse animation */
+.marker-radar-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: mapRadarPulse 2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+.marker-radar-ring.tech-ring {
+  border: 2px solid rgba(0, 240, 255, 0.7);
+  background: rgba(0, 240, 255, 0.2);
+}
+
+.marker-radar-ring.user-ring {
+  border: 2px solid rgba(255, 68, 68, 0.7);
+  background: rgba(255, 68, 68, 0.2);
+}
+
+@keyframes mapRadarPulse {
+  0% {
+    width: 24px;
+    height: 24px;
+    opacity: 0.9;
+  }
+  100% {
+    width: 58px;
+    height: 58px;
+    opacity: 0;
+  }
+}
+
+/* Core pin disc */
+.marker-core-disc {
+  position: relative;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  transition: transform 0.25s ease;
+}
+
+.marker-core-disc:hover {
+  transform: scale(1.12);
+}
+
+.marker-core-disc.tech-disc {
+  background: linear-gradient(135deg, #00F0FF, #0088FF);
+  border: 3px solid #0d121f;
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.6);
+  color: #0b0f19;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.marker-core-disc.user-disc {
+  background: linear-gradient(135deg, #ff4d4d, #cc0000);
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 0 16px rgba(255, 51, 51, 0.6);
+  color: #FFFFFF;
+  font-size: 15px;
+}
+
+/* Floating status label chip above pin */
+.marker-floating-chip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.marker-floating-chip.tech-chip {
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: #00F0FF;
+}
+
+.marker-floating-chip.user-chip {
+  border: 1px solid rgba(255, 80, 80, 0.4);
+  color: #ff9999;
+}
+
+.marker-chip-badge {
+  background: rgba(0, 240, 255, 0.2);
+  color: #00F0FF;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+}
+
+/* 3. Floating Map Controls (Simple, Attractive, Intuitive) */
+.map-top-hud {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: 9999px;
+  padding: 8px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  max-width: 92%;
+}
+
+.map-top-hud:hover {
+  background: rgba(20, 30, 52, 0.95);
+  border-color: rgba(0, 240, 255, 0.5);
+  box-shadow: 0 10px 28px rgba(0, 240, 255, 0.2);
+  transform: translateX(-50%) translateY(-1px);
+}
+
+.map-hud-live-dot {
+  width: 9px;
+  height: 9px;
+  background-color: #00F0FF;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #00F0FF;
+  animation: hudDotBlink 1.4s infinite alternate;
+  flex-shrink: 0;
+}
+
+@keyframes hudDotBlink {
+  0% { opacity: 0.4; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1.2); }
+}
+
+.map-hud-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.map-hud-stat strong {
+  color: #00F0FF;
+}
+
+/* Floating Action Toolbar on the right side */
+.map-action-toolbar {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.map-tool-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  outline: none;
+}
+
+.map-tool-btn:hover {
+  background: rgba(30, 41, 59, 0.98);
+  border-color: #00F0FF;
+  color: #00F0FF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 240, 255, 0.25);
+}
+
+.map-tool-btn:active {
+  transform: scale(0.95);
+}
+
+.map-tool-btn.active {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: #00F0FF;
+  color: #00F0FF;
+}
+
+/* Tooltip on hover */
+.map-tool-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.map-tool-btn:hover::after {
+  opacity: 1;
+}
+
+/* Bottom status bar pill (for quick zoom/speed info) */
+.map-bottom-info {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+/* 4. Enhanced Leaflet Popups */
+.leaflet-popup-content-wrapper {
+  background: rgba(15, 23, 42, 0.95) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(0, 240, 255, 0.25) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6) !important;
+  color: #f1f5f9 !important;
+  padding: 4px !important;
+}
+
+.leaflet-popup-tip {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid rgba(0, 240, 255, 0.25) !important;
+}
+
+.map-popup-card {
+  padding: 6px;
+  min-width: 200px;
+}
+
+.map-popup-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.map-popup-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #00F0FF;
+  object-fit: cover;
+  background-color: #1e293b;
+}
+
+.map-popup-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.map-popup-sub {
+  font-size: 0.8rem;
+  color: #00F0FF;
+  margin: 0;
+}
+
+.map-popup-meta {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .map-top-hud {
+    font-size: 0.78rem;
+    padding: 6px 12px;
+    gap: 8px;
+    top: 10px;
+  }
+  .map-action-toolbar {
+    top: 10px;
+    right: 10px;
+    gap: 6px;
+  }
+  .map-tool-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+  }
+  .map-tool-btn::after {
+    display: none; /* Hide tooltips on mobile touch */
+  }
+}
+
+/* 7. Location Search & Autocomplete Styles */
+.loc-search-wrap {
+  position: relative;
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+.loc-search-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.loc-search-input-wrap {
+  position: relative;
+  flex: 1;
+}
+
+.loc-search-input {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 2.5rem !important;
+  font-size: 0.92rem !important;
+  background: var(--surface-1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  color: var(--text-primary) !important;
+  transition: all 0.2s ease !important;
+}
+
+.loc-search-input:focus {
+  border-color: var(--accent-aqua) !important;
+  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.15) !important;
+}
+
+.loc-search-icon-left {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.loc-search-clear-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loc-search-clear-btn:hover {
+  color: var(--text-primary);
+}
+
+.loc-search-btn {
+  min-height: 44px;
+  padding: 0 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.loc-suggestions-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: rgba(15, 23, 42, 0.98);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.loc-suggestion-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.15s ease;
+}
+
+.loc-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.loc-suggestion-item:hover,
+.loc-suggestion-item.active {
+  background: rgba(0, 240, 255, 0.12);
+}
+
+.loc-suggestion-icon {
+  font-size: 1.1rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.loc-suggestion-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.loc-suggestion-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #fff;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.loc-suggestion-badge {
+  font-size: 0.7rem;
+  background: rgba(0, 240, 255, 0.15);
+  color: #00f0ff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.loc-suggestion-desc {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.loc-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-top: 4px;
+  margin-bottom: 6px;
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--accent-aqua);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+}
+
+

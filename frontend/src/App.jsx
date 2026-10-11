@@ -12,6 +12,7 @@ import { ToastProvider } from './components/Toast';
 
 import './styles/global.css';
 import './styles/components.css';
+import './styles/map.css';
 import './styles/pages.css';
 import './styles/responsive.css';
 

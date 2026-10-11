@@ -162,7 +162,8 @@ input:focus, select:focus, textarea:focus {
 }
 
 .dark-tile-layer {
-  filter: brightness(0.6) invert(100%) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+  /* Native CartoDB dark matter / voyager tiles are crystal clear without CSS filter hacks */
+  filter: none;
 }
 
 .leaflet-popup-content-wrapper, .leaflet-popup-tip {

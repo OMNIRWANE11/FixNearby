@@ -3,6 +3,7 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../components/Toast';
 import api from '../services/api';
+import LocationPicker from '../components/LocationPicker';
 
 export function Register() {
   const [role, setRole] = useState('customer'); // customer or technician
@@ -14,7 +15,12 @@ export function Register() {
   const [categoryId, setCategoryId] = useState('');
   const [experienceYears, setExperienceYears] = useState(1);
   const [operatingRadiusKm, setOperatingRadiusKm] = useState(15);
-  const [savedAddress, setSavedAddress] = useState('');
+  const [location, setLocation] = useState({
+    latitude: 16.7050,
+    longitude: 74.2433,
+    address: '',
+    accuracy: 10,
+  });
   
   // New technician fields
   const [shopName, setShopName] = useState('');
@@ -65,14 +71,16 @@ export function Register() {
         fullName: fullName.trim(),
         phone: phone.trim(),
         role,
-        savedAddress: savedAddress.trim() || undefined,
+        savedAddress: location.address ? location.address.trim() : undefined,
+        savedLatitude: location.latitude,
+        savedLongitude: location.longitude,
         ...(role === 'technician' ? { 
           trade, 
           categoryId: Number(categoryId),
           experienceYears: Number(experienceYears),
           operatingRadiusKm: Number(operatingRadiusKm),
           shopName: shopName.trim() || undefined,
-          shopAddress: shopAddress.trim() || undefined,
+          shopAddress: shopAddress.trim() || location.address || undefined,
           shopContact: shopContact.trim() || undefined,
           educationDegree: educationDegree.trim() || undefined,
           certifications: certifications.trim() || undefined,
@@ -164,15 +172,24 @@ export function Register() {
             />
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
-              Residential / Base Address
-            </label>
-            <input
-              type="text"
-              value={savedAddress}
-              onChange={(e) => setSavedAddress(e.target.value)}
-              placeholder="e.g. 123 Main St, Kolhapur"
+          {/* Interactive Location Pin / GPS Picker */}
+          <div style={{ marginBottom: '1.25rem', padding: '1.25rem', background: 'var(--surface-2)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+            <h4 style={{ fontSize: '0.95rem', marginBottom: '0.4rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>📍</span>
+              <span>{role === 'technician' ? 'Shop / Workshop Service Location' : 'Home / Residential Location'}</span>
+            </h4>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
+              {role === 'technician'
+                ? 'Your operating radius and customer distance will be calculated from this pinned location.'
+                : 'Save your exact location now for instant 1-tap dispatch in future emergencies.'}
+            </p>
+            <LocationPicker
+              location={location}
+              onLocationChange={setLocation}
+              addressLabel={role === 'technician' ? 'Workshop / Base Address:' : 'Street Address / Landmark:'}
+              mapHeight="240px"
+              hint="Tap anywhere on the map or drag the pin to set your exact location in Kolhapur."
+              buttonText="USE MY CURRENT GPS LOCATION"
             />
           </div>
 

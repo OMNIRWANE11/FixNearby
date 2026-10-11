@@ -4,6 +4,8 @@ import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../components/Toast';
 import api from '../services/api';
 
+import LocationPicker from '../components/LocationPicker';
+
 export function Profile() {
   const { user, isAuthenticated, logout, setUser } = useAuth();
   const navigate = useNavigate();
@@ -11,7 +13,12 @@ export function Profile() {
 
   const [fullName, setFullName] = useState(user?.fullName || '');
   const [phone, setPhone] = useState(user?.phone || '');
-  const [address, setAddress] = useState(user?.savedAddress || '');
+  const [location, setLocation] = useState({
+    latitude: user?.savedLatitude || 16.7050,
+    longitude: user?.savedLongitude || 74.2433,
+    address: user?.savedAddress || '',
+    accuracy: 10,
+  });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -20,6 +27,19 @@ export function Profile() {
     }
   }, [isAuthenticated, navigate]);
 
+  useEffect(() => {
+    if (user) {
+      setFullName(user.fullName || '');
+      setPhone(user.phone || '');
+      setLocation({
+        latitude: user.savedLatitude || 16.7050,
+        longitude: user.savedLongitude || 74.2433,
+        address: user.savedAddress || '',
+        accuracy: 10,
+      });
+    }
+  }, [user]);
+
   const handleUpdate = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -27,14 +47,16 @@ export function Profile() {
       const res = await api.auth.updateProfile({
         fullName: fullName.trim(),
         phone: phone.trim(),
-        savedAddress: address.trim(),
+        savedAddress: location.address ? location.address.trim() : '',
+        savedLatitude: location.latitude,
+        savedLongitude: location.longitude,
       });
       if (res.success && res.data) {
         setUser(res.data);
-        showToast('Profile information updated successfully.', 'success');
+        showToast('Profile and saved location updated successfully!', 'success');
       }
     } catch (err) {
-      showToast(err.error?.message || 'Failed to update profile.', 'error');
+      showToast(err.error?.message || err.message || 'Failed to update profile.', 'error');
     } finally {
       setSaving(false);
     }
@@ -90,15 +112,22 @@ export function Profile() {
             />
           </div>
 
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.35rem', color: 'var(--text-secondary)' }}>
-              Saved Home / Business Address
-            </label>
-            <textarea
-              rows={3}
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="e.g., Flat 402, Royal Palms, Shahupuri 2nd Lane, Kolhapur"
+          {/* Interactive Saved Location Picker */}
+          <div style={{ marginBottom: '1.5rem', padding: '1.25rem', background: 'var(--surface-2)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+            <h4 style={{ fontSize: '1rem', marginBottom: '0.75rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>📍</span>
+              <span>Saved Home / Base Location</span>
+            </h4>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+              Emergency technicians will use this pinned location when you request rapid dispatch from home.
+            </p>
+            <LocationPicker
+              location={location}
+              onLocationChange={setLocation}
+              addressLabel="Home / Office Street Address:"
+              mapHeight="280px"
+              hint="Tap anywhere on the map or drag the pin to set your exact home base."
+              buttonText="DETECT CURRENT GPS LOCATION"
             />
           </div>
 
