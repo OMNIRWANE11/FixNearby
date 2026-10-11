@@ -68,6 +68,7 @@ class EmergencyRequest(db.Model):
             "routePolyline": self.route_polyline,
             "cancellationReason": self.cancellation_reason,
             "hasReview": bool(self.review),
+            "review": self.review.to_dict() if self.review else None,
             "createdAt": self.created_at.isoformat() if self.created_at else None,
             "updatedAt": self.updated_at.isoformat() if self.updated_at else None
         }

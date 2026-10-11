@@ -29,6 +29,13 @@ class Technician(db.Model):
     current_latitude = db.Column(db.Float, nullable=False)
     current_longitude = db.Column(db.Float, nullable=False)
 
+    shop_name = db.Column(db.String(150), nullable=True)
+    shop_address = db.Column(db.String(255), nullable=True)
+    shop_contact = db.Column(db.String(50), nullable=True)
+    education_degree = db.Column(db.String(150), nullable=True)
+    certifications = db.Column(db.String(255), nullable=True)
+    license_number = db.Column(db.String(100), nullable=True)
+
     # PostGIS Geography Column (if available in PostgreSQL environment)
     if Geography is not None:
         current_location = db.Column(Geography(geometry_type='POINT', srid=4326, spatial_index=True), nullable=True)
@@ -43,6 +50,14 @@ class Technician(db.Model):
     assigned_requests = db.relationship("EmergencyRequest", backref="assigned_technician", lazy="dynamic", foreign_keys="EmergencyRequest.assigned_technician_id")
     reviews = db.relationship("Review", backref="technician", lazy="dynamic", cascade="all, delete-orphan")
     location_logs = db.relationship("LocationLog", backref="technician", lazy="dynamic", cascade="all, delete-orphan")
+
+    @property
+    def is_busy(self):
+        # A technician is busy if they have any request that is currently active
+        from app.models.emergency_request import EmergencyRequest
+        active_statuses = ["ASSIGNED", "ON_THE_WAY", "ARRIVED"]
+        active_count = self.assigned_requests.filter(EmergencyRequest.status.in_(active_statuses)).count()
+        return active_count > 0
 
     def to_dict(self, include_credentials=False, distance_km=None, eta_minutes=None):
         data = {
@@ -60,11 +75,18 @@ class Technician(db.Model):
             "jobsCompleted": self.jobs_completed,
             "operatingRadiusKm": float(self.operating_radius_km),
             "isOnDuty": self.is_on_duty,
+            "isBusy": self.is_busy,
             "isVerified": self.is_verified,
             "profileImageUrl": self.profile_image_url or "/images/technicians/tech-default.svg",
             "specialties": [s.strip() for s in self.specialties.split(",")] if self.specialties else [],
             "currentLatitude": self.current_latitude,
             "currentLongitude": self.current_longitude,
+            "shopName": self.shop_name,
+            "shopAddress": self.shop_address,
+            "shopContact": self.shop_contact,
+            "educationDegree": self.education_degree,
+            "certifications": self.certifications,
+            "licenseNumber": self.license_number,
             "distanceKm": round(distance_km, 1) if distance_km is not None else None,
             "etaMinutes": eta_minutes,
             "createdAt": self.created_at.isoformat() if self.created_at else None

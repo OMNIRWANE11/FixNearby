@@ -15,6 +15,12 @@ class RegisterSchema(Schema):
     trade = fields.String(load_default=None)
     experienceYears = fields.Integer(load_default=1)
     operatingRadiusKm = fields.Float(load_default=15.0)
+    shopName = fields.String(load_default=None)
+    shopAddress = fields.String(load_default=None)
+    shopContact = fields.String(load_default=None)
+    educationDegree = fields.String(load_default=None)
+    certifications = fields.String(load_default=None)
+    licenseNumber = fields.String(load_default=None)
 
 class LoginSchema(Schema):
     email = fields.Email(required=True)

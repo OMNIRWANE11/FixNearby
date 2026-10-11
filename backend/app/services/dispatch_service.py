@@ -45,6 +45,13 @@ class DispatchService:
             on_duty_only=True
         )
 
+        # Exclude the technician themselves if they are the ones requesting help
+        if user_id:
+            nearby_candidates = [
+                item for item in nearby_candidates 
+                if item["technician"].user_id != user_id
+            ]
+
         candidates_list = []
         best_route = None
 
@@ -81,7 +88,19 @@ class DispatchService:
                 "distanceKm": dist_km,
                 "etaMinutes": eta_min,
                 "currentLatitude": tech.current_latitude,
-                "currentLongitude": tech.current_longitude
+                "currentLongitude": tech.current_longitude,
+                "experienceYears": tech.experience_years,
+                "operatingRadiusKm": float(tech.operating_radius_km),
+                "isOnDuty": tech.is_on_duty,
+                "isBusy": tech.is_busy,
+                "shopName": tech.shop_name,
+                "shopAddress": tech.shop_address,
+                "shopContact": tech.shop_contact,
+                "educationDegree": tech.education_degree,
+                "certifications": tech.certifications,
+                "licenseNumber": tech.license_number,
+                "specialties": [s.strip() for s in tech.specialties.split(",")] if tech.specialties else [],
+                "categoryName": tech.category.name if tech.category else None
             })
 
         # Pre-assign first closest technician if available
@@ -112,6 +131,9 @@ class DispatchService:
         tech = Technician.query.get(technician_id)
         if not tech:
             raise ValueError("Technician not found.")
+        
+        if tech.is_busy:
+            raise ValueError("Technician is currently busy and cannot be assigned.")
 
         # Compute route between technician and customer
         route_info = OSRMClient.get_route(

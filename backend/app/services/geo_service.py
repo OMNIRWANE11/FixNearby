@@ -132,6 +132,8 @@ class GeoService:
         candidates_with_dist = []
 
         for tech in all_candidates:
+            if tech.is_busy:
+                continue
             dist = haversine_distance_km(lat, lng, tech.current_latitude, tech.current_longitude)
             # Check operating radius and requested radius
             max_allowed_radius = min(radius_km, float(tech.operating_radius_km))

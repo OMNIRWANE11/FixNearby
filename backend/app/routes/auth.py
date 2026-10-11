@@ -52,26 +52,32 @@ def register():
             experience_years=data.get("experienceYears", 1),
             phone=user.phone,
             whatsapp_number=user.phone,
-            rating=5.0,
+            rating=0.0,
             jobs_completed=0,
             operating_radius_km=data.get("operatingRadiusKm", 15.0),
             is_on_duty=False,
-            is_verified=False,
+            is_verified=True,  # Auto-verified so they are visible immediately
             current_latitude=data.get("savedLatitude") or 16.7050,
-            current_longitude=data.get("savedLongitude") or 74.2433
+            current_longitude=data.get("savedLongitude") or 74.2433,
+            shop_name=data.get("shopName"),
+            shop_address=data.get("shopAddress"),
+            shop_contact=data.get("shopContact"),
+            education_degree=data.get("educationDegree"),
+            certifications=data.get("certifications"),
+            license_number=data.get("licenseNumber")
         )
         db.session.add(tech)
         db.session.commit()
 
-        # Initialize pending credentials
+        # Initialize credentials as verified
         cred = Credential(
             technician_id=tech.id,
             legal_name=user.full_name,
-            identity_verified=False,
-            license_verified=False,
-            address_verified=False,
-            police_verified=False,
-            audit_notes="New registration - verification documents pending review."
+            identity_verified=True,
+            license_verified=True,
+            address_verified=True,
+            police_verified=True,
+            audit_notes="Auto-verified on registration."
         )
         db.session.add(cred)
         db.session.commit()
