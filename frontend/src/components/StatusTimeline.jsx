@@ -24,6 +24,32 @@ export function StatusTimeline({ currentStatus = 'PENDING' }) {
 
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '1.25rem 0', position: 'relative' }}>
+      {/* Background Track Line */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '16px',
+          left: '8%',
+          right: '8%',
+          height: '2px',
+          backgroundColor: 'var(--border)',
+          zIndex: 1,
+        }}
+      />
+      {/* Active Filled Progress Line */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '16px',
+          left: '8%',
+          width: `${(Math.min(currentIndex, STATUS_STAGES.length - 1) / (STATUS_STAGES.length - 1)) * 84}%`,
+          height: '2px',
+          backgroundColor: 'var(--accent-aqua)',
+          boxShadow: 'var(--accent-aqua-glow)',
+          zIndex: 1,
+          transition: 'width 0.4s ease',
+        }}
+      />
       {STATUS_STAGES.map((stage, idx) => {
         const isPassed = idx <= currentIndex;
         const isCurrent = idx === currentIndex;

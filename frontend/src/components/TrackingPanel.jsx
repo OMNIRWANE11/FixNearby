@@ -5,7 +5,7 @@ import { formatDistance, formatEta } from '../utils/formatters';
 import StatusTimeline from './StatusTimeline';
 import RatingStars from './RatingStars';
 
-export function TrackingPanel({ trackingData, onCancelRequest, onCompleteReview, fallbackNotice }) {
+export function TrackingPanel({ trackingData, onCancelRequest, onCompleteReview, fallbackNotice, onAcceptByTechnician }) {
   const navigate = useNavigate();
   if (!trackingData) return null;
 
@@ -37,13 +37,25 @@ export function TrackingPanel({ trackingData, onCancelRequest, onCompleteReview,
       {/* Live ETA Box */}
       <div className="tracking-eta-badge">
         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          {status === 'ARRIVED' ? 'TECHNICIAN ARRIVED' : 'ESTIMATED ARRIVAL TIME'}
+          {status === 'ARRIVED'
+            ? 'TECHNICIAN ARRIVED'
+            : status === 'PENDING'
+            ? 'WAITING FOR TECHNICIAN'
+            : 'ESTIMATED ARRIVAL TIME'}
         </div>
         <div className="tracking-eta-time">
-          {status === 'ARRIVED' ? 'AT YOUR DOOR' : formatEta(etaMinutes)}
+          {status === 'ARRIVED'
+            ? 'AT YOUR DOOR'
+            : status === 'PENDING'
+            ? 'Awaiting Acceptance'
+            : formatEta(etaMinutes)}
         </div>
         <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-          {status === 'ARRIVED' ? 'Ready for entry verification' : `${formatDistance(distanceRemainingKm)} remaining`}
+          {status === 'ARRIVED'
+            ? 'Ready for entry verification'
+            : status === 'PENDING'
+            ? `Dispatched to ${technician?.name || 'nearest provider'} • Standing by`
+            : `${formatDistance(distanceRemainingKm)} remaining`}
         </div>
       </div>
 
@@ -106,20 +118,93 @@ export function TrackingPanel({ trackingData, onCancelRequest, onCompleteReview,
       )}
 
       {/* Review / Cancel Actions */}
-      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        {['ASSIGNED', 'ON_THE_WAY', 'ARRIVED', 'COMPLETED'].includes(status) && (
+      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+        {['ARRIVED', 'COMPLETED'].includes(status) && (
           <button className="btn-primary" onClick={onCompleteReview}>
             ⭐ Leave Review & Complete Job
           </button>
         )}
-        {['PENDING', 'ASSIGNED', 'ON_THE_WAY'].includes(status) && (
-          <button
-            className="btn-secondary"
-            style={{ color: 'var(--alert-red)', borderColor: 'rgba(255,51,51,0.3)' }}
-            onClick={onCancelRequest}
-          >
-            Cancel Emergency Request
-          </button>
+
+        {/* 1. WHILE PENDING: Customer can cancel, waiting for technician */}
+        {status === 'PENDING' && (
+          <>
+            <div
+              style={{
+                fontSize: '0.8rem',
+                color: 'var(--text-secondary)',
+                textAlign: 'center',
+                padding: '0.5rem 0.75rem',
+                background: 'var(--surface-2)',
+                borderRadius: '8px',
+                border: '1px solid var(--border)',
+                lineHeight: 1.4,
+              }}
+            >
+              ⏳ Awaiting technician response. You can cancel at any time before acceptance.
+            </div>
+
+            <button
+              className="btn-secondary"
+              style={{ color: 'var(--alert-red)', borderColor: 'rgba(255,51,51,0.3)', width: '100%' }}
+              onClick={onCancelRequest}
+            >
+              Cancel Emergency Request
+            </button>
+
+            {onAcceptByTechnician && (
+              <button
+                className="btn-primary"
+                style={{
+                  background: 'linear-gradient(135deg, #00C853 0%, #00E676 100%)',
+                  border: 'none',
+                  color: '#000',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  minHeight: '40px',
+                  marginTop: '0.2rem'
+                }}
+                onClick={onAcceptByTechnician}
+                title="Accept this request on behalf of technician"
+              >
+                👨‍🔧 Accept as Technician (Test / Quick Accept)
+              </button>
+            )}
+          </>
+        )}
+
+        {/* 2. ONCE ACCEPTED / ON THE WAY: Cancellation is LOCKED! */}
+        {['ASSIGNED', 'ON_THE_WAY'].includes(status) && (
+          <>
+            <div
+              style={{
+                fontSize: '0.85rem',
+                color: 'var(--accent-aqua)',
+                textAlign: 'center',
+                padding: '0.65rem 0.85rem',
+                background: 'rgba(0, 230, 204, 0.08)',
+                borderRadius: '8px',
+                border: '1px solid rgba(0, 230, 204, 0.3)',
+                lineHeight: 1.4,
+                fontWeight: 600
+              }}
+            >
+              🔒 <strong>Cancellation Locked</strong>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 400, marginTop: '0.2rem' }}>
+                Technician has accepted your call and is actively traveling to your address.
+              </div>
+            </div>
+
+            <div
+              style={{
+                fontSize: '0.78rem',
+                color: 'var(--text-muted)',
+                textAlign: 'center',
+                marginTop: '0.1rem'
+              }}
+            >
+              Rating and reviews unlock after service is delivered.
+            </div>
+          </>
         )}
       </div>
     </div>

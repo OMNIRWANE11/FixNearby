@@ -72,6 +72,8 @@ export const api = {
   requests: {
     create: (data) => apiClient.post('/requests', data),
     getById: (id) => apiClient.get(`/requests/${id}`),
+    requestTechnician: (id, technicianId) => apiClient.patch(`/requests/${id}/request-technician`, { technicianId }),
+    acceptRequest: (id) => apiClient.post(`/requests/${id}/accept`),
     assign: (id, technicianId) => apiClient.patch(`/requests/${id}/assign`, { technicianId }),
     updateStatus: (id, data) => apiClient.patch(`/requests/${id}/status`, data),
     review: (id, data) => apiClient.post(`/requests/${id}/review`, data),

@@ -6,6 +6,7 @@ import Loader from '../components/Loader';
 import { useAuth } from '../hooks/useAuth';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { useToast } from '../components/Toast';
+import socketService from '../services/socket';
 import api from '../services/api';
 
 export function ProviderPortal() {
@@ -50,30 +51,69 @@ export function ProviderPortal() {
     if (isTechnician) {
       loadRequests();
       const interval = setInterval(loadRequests, 12000); // 12-second refresh
-      return () => clearInterval(interval);
+
+      // Listen for instant emergency dispatches via Socket.IO
+      const socket = socketService.connect();
+      const handleBroadcast = (data) => {
+        showToast(`🚨 NEW EMERGENCY BROADCAST: ${data.problem || 'Service Request'}`, 'warning');
+        loadRequests();
+      };
+      socket.on('new_emergency_broadcast', handleBroadcast);
+
+      return () => {
+        clearInterval(interval);
+        socket.off('new_emergency_broadcast', handleBroadcast);
+      };
     }
   }, [isTechnician]);
 
-  // Periodic location heartbeat when online (15-second interval)
+  // Periodic location heartbeat and real-time GPS tracking when online
   useEffect(() => {
     if (!isOnDuty || !location.latitude) return;
 
-    const sendHeartbeat = async () => {
+    const activeReq = requests.activeRequests?.[0];
+    const heartbeatInterval = activeReq ? 4000 : 15000; // 4s rapid GPS when responding, 15s when idle
+
+    const sendHeartbeat = async (coords) => {
       try {
-        await api.provider.updateLocation({
-          latitude: location.latitude,
-          longitude: location.longitude,
-          speedKmh: 30.0,
-        });
+        const payload = {
+          latitude: coords?.latitude || location.latitude,
+          longitude: coords?.longitude || location.longitude,
+          speedKmh: coords?.speedKmh || 30.0,
+        };
+        if (activeReq?.id) {
+          payload.requestId = activeReq.id;
+        }
+        await api.provider.updateLocation(payload);
       } catch (err) {
         // Silent
       }
     };
 
     sendHeartbeat();
-    const timer = setInterval(sendHeartbeat, 15000);
-    return () => clearInterval(timer);
-  }, [isOnDuty, location.latitude, location.longitude]);
+    const timer = setInterval(() => sendHeartbeat(), heartbeatInterval);
+
+    // Watch position directly from device GPS for real-time mobile tracking
+    let watchId = null;
+    if (activeReq && navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          sendHeartbeat({
+            latitude: Number(pos.coords.latitude.toFixed(6)),
+            longitude: Number(pos.coords.longitude.toFixed(6)),
+            speedKmh: pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 30.0,
+          });
+        },
+        () => {},
+        { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
+      );
+    }
+
+    return () => {
+      clearInterval(timer);
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+    };
+  }, [isOnDuty, location.latitude, location.longitude, requests.activeRequests]);
 
   const handleToggleDuty = async () => {
     const nextState = !isOnDuty;
@@ -131,7 +171,7 @@ export function ProviderPortal() {
           </div>
         </div>
 
-        {/* Large Duty Switch Button & Logout */}
+        {/* Large Duty Switch Button, Profile Link & Logout */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-end' }}>
           <button
             className={`duty-toggle-btn ${isOnDuty ? 'online' : 'offline'}`}
@@ -140,24 +180,46 @@ export function ProviderPortal() {
             {isOnDuty ? '🟢 ONLINE & ACTIVE' : '⚪ GO ON DUTY'}
           </button>
           
-          <button 
-            onClick={() => {
-              logout();
-              navigate('/login');
-              showToast('Logged out successfully', 'info');
-            }}
-            style={{
-              background: 'transparent',
-              border: '1px solid var(--border)',
-              color: 'var(--text-secondary)',
-              padding: '0.4rem 1rem',
-              borderRadius: '6px',
-              fontSize: '0.85rem',
-              cursor: 'pointer'
-            }}
-          >
-            Log Out
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <button 
+              onClick={() => navigate('/profile')}
+              style={{
+                background: 'var(--surface-2)',
+                border: '1px solid var(--border)',
+                color: 'var(--text-primary)',
+                padding: '0.4rem 0.85rem',
+                borderRadius: '6px',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+              title="Update Personal Info, Shop Details & Base Location"
+            >
+              <span>⚙️</span>
+              <span>Edit Profile & Location</span>
+            </button>
+
+            <button 
+              onClick={() => {
+                logout();
+                navigate('/login');
+                showToast('Logged out successfully', 'info');
+              }}
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--border)',
+                color: 'var(--text-secondary)',
+                padding: '0.4rem 0.85rem',
+                borderRadius: '6px',
+                fontSize: '0.85rem',
+                cursor: 'pointer'
+              }}
+            >
+              Log Out
+            </button>
+          </div>
         </div>
       </div>
 
@@ -192,6 +254,42 @@ export function ProviderPortal() {
       {/* 3. Active Emergency In-Progress */}
       {requests.activeRequests && requests.activeRequests.length > 0 && (
         <section style={{ marginBottom: '3rem' }}>
+          {/* Live Mobile GPS Telemetry Broadcaster Status */}
+          <div
+            style={{
+              background: 'rgba(0, 230, 204, 0.08)',
+              border: '1px solid var(--accent-aqua)',
+              borderRadius: '12px',
+              padding: '1.25rem',
+              marginBottom: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '1rem',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+              <span style={{ fontSize: '1.8rem' }}>📡</span>
+              <div>
+                <div style={{ fontWeight: 800, color: 'var(--accent-aqua)', fontSize: '1.05rem' }}>
+                  REAL-TIME GPS BROADCASTER ACTIVE
+                </div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  Broadcasting your device's live GPS coordinates to customer: <strong>{requests.activeRequests[0].customerName}</strong>
+                </div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', fontSize: '0.85rem' }}>
+              <div style={{ background: 'var(--surface-2)', padding: '0.4rem 0.8rem', borderRadius: '6px', fontFamily: 'monospace' }}>
+                📍 Lat: {location.latitude ? location.latitude.toFixed(5) : '--'}, Lng: {location.longitude ? location.longitude.toFixed(5) : '--'}
+              </div>
+              <span className="badge-tag badge-verified">
+                🟢 Live Socket Emitting
+              </span>
+            </div>
+          </div>
+
           <h2 style={{ fontSize: '1.4rem', color: 'var(--alert-red)', marginBottom: '1rem' }}>
             🚨 Active Emergency Calls in Progress ({requests.activeRequests.length})
           </h2>

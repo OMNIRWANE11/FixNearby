@@ -40,15 +40,20 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (userData) => {
-    const res = await api.auth.register(userData);
-    if (res.success && res.data) {
-      const { token: jwtToken, user: registeredUser } = res.data;
-      localStorage.setItem('fn_token', jwtToken);
-      setToken(jwtToken);
-      setUser(registeredUser);
-      return registeredUser;
+    try {
+      const res = await api.auth.register(userData);
+      if (res.success && res.data) {
+        const { token: jwtToken, user: registeredUser } = res.data;
+        localStorage.setItem('fn_token', jwtToken);
+        setToken(jwtToken);
+        setUser(registeredUser);
+        return registeredUser;
+      }
+      throw new Error(res.error?.message || 'Registration failed');
+    } catch (err) {
+      const msg = err.error?.message || err.message || 'Registration failed';
+      throw new Error(msg);
     }
-    throw new Error(res.error?.message || 'Registration failed');
   };
 
   const logout = () => {

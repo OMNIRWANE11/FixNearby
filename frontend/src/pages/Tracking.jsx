@@ -31,7 +31,10 @@ export function Tracking() {
       try {
         const res = await api.tracking.getTracking(requestId);
         if (res.success && res.data) {
-          setTrackingData(res.data);
+          const normalizedStatus = (res.data.status === 'ASSIGNED' && res.data.technician)
+            ? 'ON_THE_WAY'
+            : res.data.status;
+          setTrackingData({ ...res.data, status: normalizedStatus });
           if (res.data.technician) {
             setTechPosition({
               latitude: res.data.technician.currentLatitude,
@@ -68,6 +71,7 @@ export function Tracking() {
               ...prev,
               distanceRemainingKm: payload.distanceRemainingKm,
               etaMinutes: payload.etaMinutes,
+              status: payload.status || (prev.status === 'ASSIGNED' ? 'ON_THE_WAY' : prev.status),
             }
           : prev
       );
@@ -115,8 +119,32 @@ export function Tracking() {
     }
   };
 
+  const handleTechnicianAccept = async () => {
+    try {
+      const res = await api.requests.acceptRequest(requestId);
+      if (res.success) {
+        showToast('Technician accepted the request! Live tracking initiated.', 'success');
+        setTrackingData((prev) => prev ? { ...prev, status: 'ON_THE_WAY' } : prev);
+      }
+    } catch (err) {
+      showToast(err.error?.message || 'Failed to accept request.', 'error');
+    }
+  };
+
+  const handleOpenReview = () => {
+    if (['PENDING', 'ASSIGNED', 'ON_THE_WAY'].includes(trackingData?.status)) {
+      showToast('Technician has not arrived or completed the service yet.', 'warning');
+      return;
+    }
+    setShowReviewModal(true);
+  };
+
   const handleSubmitReview = async (e) => {
     e.preventDefault();
+    if (['PENDING', 'ASSIGNED', 'ON_THE_WAY'].includes(trackingData?.status)) {
+      showToast('Cannot submit review while technician is still on the way.', 'error');
+      return;
+    }
     setSubmittingReview(true);
     try {
       if (trackingData?.status !== 'COMPLETED') {
@@ -170,7 +198,8 @@ export function Tracking() {
       <TrackingPanel
         trackingData={trackingData}
         onCancelRequest={handleCancelRequest}
-        onCompleteReview={() => setShowReviewModal(true)}
+        onCompleteReview={handleOpenReview}
+        onAcceptByTechnician={handleTechnicianAccept}
       />
 
       {/* 3. Review & Rating Modal */}

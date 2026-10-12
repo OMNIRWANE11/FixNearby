@@ -79,10 +79,23 @@ export function Navbar() {
 
           {/* User / Provider Login */}
           {isAuthenticated ? (
-            <Link to={user.role === 'technician' ? '/provider' : '/profile'} className="nav-account-btn">
-              <span>👤</span>
-              <span>{user.role === 'technician' ? 'Provider Portal' : 'My Account'}</span>
-            </Link>
+            user.role === 'technician' ? (
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <Link to="/provider" className="nav-account-btn">
+                  <span>🛠️</span>
+                  <span>Console</span>
+                </Link>
+                <Link to="/profile" className="nav-account-btn" title="Edit Profile & Shop Location">
+                  <span>⚙️</span>
+                  <span>Profile</span>
+                </Link>
+              </div>
+            ) : (
+              <Link to="/profile" className="nav-account-btn">
+                <span>👤</span>
+                <span>My Account</span>
+              </Link>
+            )
           ) : (
             <Link to="/login" className="nav-account-btn btn-provider-link">
               <span>👤</span>

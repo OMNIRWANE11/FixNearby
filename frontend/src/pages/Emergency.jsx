@@ -144,8 +144,8 @@ export function Emergency() {
   const handleSelectTechnician = async (tech) => {
     if (!dispatchResult?.request?.id) return;
     try {
-      await api.requests.assign(dispatchResult.request.id, tech.id);
-      showToast(`Technician ${tech.name} assigned. Starting live tracking!`, 'success');
+      await api.requests.requestTechnician(dispatchResult.request.id, tech.id);
+      showToast(`Emergency request sent to ${tech.name}. Awaiting acceptance!`, 'info');
       navigate(`/tracking/${dispatchResult.request.id}`);
     } catch (err) {
       navigate(`/tracking/${dispatchResult.request.id}`);
@@ -476,7 +476,7 @@ export function Emergency() {
                         padding: '0 0.5rem'
                       }}
                     >
-                      SELECT & TRACK ➔
+                      REQUEST SERVICE ➔
                     </button>
                   </div>
                 </div>
@@ -491,7 +491,7 @@ export function Emergency() {
         <TechnicianProfile
           technician={selectedProfile}
           onClose={() => setSelectedProfile(null)}
-          actionButtonLabel="SELECT TECHNICIAN & START LIVE TRACKING ➔"
+          actionButtonLabel="DISPATCH REQUEST TO TECHNICIAN ➔"
           onSelect={(tech) => {
             setSelectedProfile(null);
             handleSelectTechnician(tech);
