@@ -29,6 +29,13 @@ def register_socket_events(socketio_instance):
             "status": "connected",
             "message": f"Connected to live updates for request {request_id}"
         })
+        req = EmergencyRequest.query.get(request_id)
+        if req:
+            emit("status_changed", {
+                "requestId": request_id,
+                "status": req.status,
+                "message": f"Current status: {req.status}"
+            })
 
     @socketio_instance.on("leave_request_room")
     def handle_leave_request_room(data):

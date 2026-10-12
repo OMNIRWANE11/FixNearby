@@ -144,7 +144,7 @@ class DispatchService:
         )
 
         req.assigned_technician_id = tech.id
-        req.status = "ASSIGNED"
+        req.status = "ON_THE_WAY"
         req.distance_km = route_info.get("distanceKm", 0.0)
         req.estimated_eta_minutes = route_info.get("durationMinutes", 10)
         req.route_polyline = json.dumps(route_info.get("coordinates", []))

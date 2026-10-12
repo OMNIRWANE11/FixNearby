@@ -83,9 +83,13 @@ def register():
         db.session.commit()
 
     access_token = create_access_token(identity=user.id)
+    user_dict = user.to_dict()
+    if user.role == "technician" and user.technician_profile:
+        user_dict["technician"] = user.technician_profile.to_dict(include_credentials=True)
+
     return api_response({
         "token": access_token,
-        "user": user.to_dict()
+        "user": user_dict
     }, "Registration successful", 201)
 
 @auth_bp.route("/login", methods=["POST"])
@@ -107,7 +111,7 @@ def login():
     access_token = create_access_token(identity=user.id)
     user_dict = user.to_dict()
     if user.role == "technician" and user.technician_profile:
-        user_dict["technician"] = user.technician_profile.to_dict()
+        user_dict["technician"] = user.technician_profile.to_dict(include_credentials=True)
 
     return api_response({
         "token": access_token,
@@ -148,11 +152,52 @@ def update_profile():
         user.phone = data["phone"].strip()
     if "savedAddress" in data:
         user.saved_address = data["savedAddress"]
-    if "savedLatitude" in data:
+    if "savedLatitude" in data and data["savedLatitude"] is not None:
         user.saved_latitude = data["savedLatitude"]
-    if "savedLongitude" in data:
+    if "savedLongitude" in data and data["savedLongitude"] is not None:
         user.saved_longitude = data["savedLongitude"]
 
+    # If technician, update technician profile & credentials
+    if user.role == "technician" and user.technician_profile:
+        tech = user.technician_profile
+        if "fullName" in data and tech.credential:
+            tech.credential.legal_name = user.full_name
+        if "phone" in data:
+            tech.phone = user.phone
+        if "savedLatitude" in data and data["savedLatitude"] is not None:
+            tech.current_latitude = data["savedLatitude"]
+        if "savedLongitude" in data and data["savedLongitude"] is not None:
+            tech.current_longitude = data["savedLongitude"]
+        if "trade" in data and data["trade"]:
+            tech.trade = data["trade"].strip()
+            if tech.credential:
+                tech.credential.trade_license_name = tech.trade
+        if "whatsappNumber" in data and data["whatsappNumber"]:
+            tech.whatsapp_number = data["whatsappNumber"].strip()
+        if "experienceYears" in data and data["experienceYears"] is not None:
+            tech.experience_years = int(data["experienceYears"])
+        if "operatingRadiusKm" in data and data["operatingRadiusKm"] is not None:
+            tech.operating_radius_km = float(data["operatingRadiusKm"])
+        if "shopName" in data:
+            tech.shop_name = data["shopName"].strip() if data["shopName"] else None
+        if "shopAddress" in data:
+            tech.shop_address = data["shopAddress"].strip() if data["shopAddress"] else None
+        if "shopContact" in data:
+            tech.shop_contact = data["shopContact"].strip() if data["shopContact"] else None
+        if "educationDegree" in data:
+            tech.education_degree = data["educationDegree"].strip() if data["educationDegree"] else None
+        if "certifications" in data:
+            tech.certifications = data["certifications"].strip() if data["certifications"] else None
+        if "licenseNumber" in data:
+            tech.license_number = data["licenseNumber"].strip() if data["licenseNumber"] else None
+            if tech.credential:
+                tech.credential.license_number = tech.license_number
+
     db.session.commit()
-    return api_response(user.to_dict(), "Profile updated successfully")
+
+    user_dict = user.to_dict()
+    if user.role == "technician" and user.technician_profile:
+        user_dict["technician"] = user.technician_profile.to_dict(include_credentials=True)
+
+    return api_response(user_dict, "Profile updated successfully")
 

@@ -8,7 +8,7 @@ from app.models.emergency_request import EmergencyRequest
 from app.models.location_log import LocationLog
 from app.schemas.technician_schema import TechnicianDutySchema, TechnicianLocationUpdateSchema
 from app.services.dispatch_service import DispatchService
-from app.services.tracking_simulator import start_tracking_simulation
+from app.services.tracking_simulator import start_tracking_simulation, stop_tracking_simulation
 from app.utils.errors import api_response, api_error
 from app.utils.security import role_required
 
@@ -76,13 +76,42 @@ def update_location():
 
     # If associated with active emergency request, broadcast via socketio
     if req_id:
+        stop_tracking_simulation(req_id)
+        req = EmergencyRequest.query.get(req_id)
+        rem_dist = None
+        rem_eta = None
+        if req:
+            from app.services.geo_service import haversine_distance_km, estimate_eta_minutes
+            rem_dist = haversine_distance_km(tech.current_latitude, tech.current_longitude, req.customer_latitude, req.customer_longitude)
+            rem_eta = estimate_eta_minutes(rem_dist, avg_speed_kmh=35.0, prep_time_min=1)
+            req.distance_km = round(rem_dist, 2)
+            req.estimated_eta_minutes = rem_eta
+            if rem_dist < 0.05 and req.status == "ON_THE_WAY":
+                req.status = "ARRIVED"
+                socketio.emit("status_changed", {
+                    "requestId": req_id,
+                    "status": "ARRIVED",
+                    "message": f"{tech.user.full_name if tech.user else 'Technician'} has arrived at your location!"
+                }, room=req_id)
+            db.session.commit()
+
         socketio.emit("technician_location_update", {
             "requestId": req_id,
             "technicianId": tech.id,
             "latitude": tech.current_latitude,
             "longitude": tech.current_longitude,
-            "speedKmh": data.get("speedKmh", 0.0)
+            "speedKmh": data.get("speedKmh", 0.0),
+            "distanceRemainingKm": round(rem_dist, 2) if rem_dist is not None else None,
+            "etaMinutes": rem_eta,
+            "status": req.status if req else "ON_THE_WAY"
         }, room=req_id)
+
+        if rem_dist is not None:
+            socketio.emit("eta_update", {
+                "requestId": req_id,
+                "etaMinutes": rem_eta,
+                "distanceRemainingKm": round(rem_dist, 2)
+            }, room=req_id)
 
     return api_response({
         "latitude": tech.current_latitude,
@@ -103,9 +132,12 @@ def get_provider_requests():
         EmergencyRequest.status.in_(["ASSIGNED", "ON_THE_WAY", "ARRIVED"])
     ).order_by(EmergencyRequest.created_at.desc()).all()
 
-    # Incoming pending requests in same category
+    # Incoming pending requests in same category or explicitly assigned to this technician
     incoming_pending = EmergencyRequest.query.filter(
-        EmergencyRequest.category_id == tech.category_id,
+        db.or_(
+            EmergencyRequest.category_id == tech.category_id,
+            EmergencyRequest.assigned_technician_id == tech.id
+        ),
         EmergencyRequest.status == "PENDING"
     ).order_by(EmergencyRequest.created_at.desc()).limit(10).all()
 
@@ -136,9 +168,16 @@ def respond_request(req_id):
     action = payload.get("action", "").lower() # accept, decline, on_the_way, arrived, complete
 
     if action == "accept":
-        DispatchService.assign_technician(req_id, tech.id)
+        req.assigned_technician_id = tech.id
+        req.status = "ON_THE_WAY"
+        db.session.commit()
         start_tracking_simulation(req_id)
-        return api_response(req.to_dict(), "Request accepted and assigned")
+        socketio.emit("status_changed", {
+            "requestId": req_id,
+            "status": "ON_THE_WAY",
+            "message": f"{tech.user.full_name if tech.user else 'Technician'} accepted your request and is on the way!"
+        }, room=req_id)
+        return api_response(req.to_dict(), "Request accepted and technician is on the way")
 
     elif action == "on_the_way":
         req.status = "ON_THE_WAY"

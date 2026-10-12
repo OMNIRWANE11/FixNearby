@@ -125,6 +125,7 @@ def _simulation_worker(app, request_id: str, stop_event: threading.Event):
                     "distanceRemainingKm": round(rem_dist, 2),
                     "etaMinutes": rem_eta,
                     "speedKmh": 32.0,
+                    "status": req.status,
                     "timestamp": datetime.utcnow().isoformat()
                 }
                 socketio.emit("technician_location_update", payload, room=request_id)

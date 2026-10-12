@@ -7,7 +7,7 @@ load_dotenv()
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 def get_database_uri():
-    configured_url = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/fixnearby")
+    configured_url = os.getenv("DATABASE_URL", "postgresql+pg8000://postgres:Nirwane11@localhost:5432/fixnearby")
     
     # If explicitly SQLite, return it
     if configured_url.startswith("sqlite"):
@@ -15,9 +15,10 @@ def get_database_uri():
 
     # Check PostgreSQL reachability with configured credentials
     try:
-        import psycopg
-        conn = psycopg.connect(configured_url, connect_timeout=1)
-        conn.close()
+        from sqlalchemy import create_engine, text
+        test_engine = create_engine(configured_url)
+        with test_engine.connect() as test_conn:
+            test_conn.execute(text("SELECT 1"))
         return configured_url
     except Exception:
         # Graceful fallback to persistent SQLite database for seamless development

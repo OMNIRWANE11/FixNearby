@@ -33,3 +33,15 @@ class ProfileUpdateSchema(Schema):
     savedLatitude = fields.Float(allow_none=True)
     savedLongitude = fields.Float(allow_none=True)
 
+    # Technician fields
+    trade = fields.String(allow_none=True)
+    experienceYears = fields.Integer(allow_none=True)
+    operatingRadiusKm = fields.Float(allow_none=True)
+    shopName = fields.String(allow_none=True)
+    shopAddress = fields.String(allow_none=True)
+    shopContact = fields.String(allow_none=True)
+    educationDegree = fields.String(allow_none=True)
+    certifications = fields.String(allow_none=True)
+    licenseNumber = fields.String(allow_none=True)
+    whatsappNumber = fields.String(allow_none=True)
+
