@@ -17,4 +17,4 @@ requests==2.31.0
 geopy==2.4.1
 pytest==8.1.1
 gunicorn==21.2.0
-
+simple-websocket==1.0.0
