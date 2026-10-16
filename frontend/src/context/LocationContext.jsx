@@ -94,24 +94,25 @@ export function LocationProvider({ children }) {
     });
   };
 
-  // Attempt initial GPS retrieval softly
+  // Attempt initial GPS retrieval and sync with permission API
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setLocation({
-            latitude: Number(pos.coords.latitude.toFixed(6)),
-            longitude: Number(pos.coords.longitude.toFixed(6)),
-            accuracy: Math.round(pos.coords.accuracy),
-            address: 'Detected GPS Location',
-          });
-          setGpsStatus('granted');
-        },
-        () => {
-          // Keep default Kolhapur coordinates
-        },
-        { enableHighAccuracy: false, timeout: 5000 }
-      );
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: 'geolocation' }).then((status) => {
+        setGpsStatus(status.state);
+        if (status.state === 'granted') {
+          requestGpsLocation();
+        }
+        status.onchange = () => {
+          setGpsStatus(status.state);
+          if (status.state === 'granted') {
+            requestGpsLocation();
+          }
+        };
+      }).catch(() => {
+        requestGpsLocation();
+      });
+    } else {
+      requestGpsLocation();
     }
   }, []);
 

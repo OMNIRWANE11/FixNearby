@@ -394,11 +394,12 @@ export function LocationPicker({
         onPosSuccess,
         (fallbackErr) => {
           setGpsLoading(false);
-          setGpsStatusState('denied');
           if (fallbackErr.code === 1) { // PERMISSION_DENIED
+            setGpsStatusState('denied');
             setPinnedFeedback('⚠️ GPS permission blocked. Please allow location access in your browser.');
           } else {
-            setPinnedFeedback('⚠️ Hardware GPS unavailable. Pinned to Kolhapur Central.');
+            setGpsStatusState('unavailable');
+            setPinnedFeedback('ℹ️ Hardware GNSS unavailable. Location synced to Kolhapur Central.');
             pointMapToCoordinates(16.7050, 74.2433, 'Kolhapur Central, Maharashtra', 'Kolhapur City');
           }
         },
